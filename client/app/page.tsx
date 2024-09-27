@@ -21,7 +21,7 @@ export default function Home() {
       </div>
 
       {/*Middle Section*/}
-      <div className="row-span-3">
+      <div className="xs:hidden row-span-3">
         <Follow/>
         <News/>
       </div>

@@ -35,23 +35,6 @@ const StoryFeed = () => {
                     })}
                 </div>
             </div>
-
-            {/* Can't figure out the issue here. The stories goes under the post story 
-            <div className="flex flex-ro space-x-4 overflow-x-auto w-full">
-                {stories.map((story, index) => {
-                    return(
-                        <div className="relative w-24" key={index}>
-                            <img src={story.image} alt={story.name} className='w-full object-cover rounded-lg'/>
-
-                            <div className="absolute bottom-0 w-full text-center bg-black bg-opacity-50 rounded-b-lg p-1">
-                                <p className='text-xs text-white'>
-                                    {story.name}
-                                </p>
-                            </div>
-                        </div>
-                    )
-                })}
-            </div> */}
         </div>
     )
 }
