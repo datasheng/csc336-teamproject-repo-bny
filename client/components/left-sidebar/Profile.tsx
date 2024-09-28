@@ -94,15 +94,14 @@ const Profile = () => {
             {/* Menu List */}
             <ul className="mt-6 space-y-4">
                 {menuItems.map((menuItem, index) => {
-                    return(
-                        <li className="flex items-center justify-start space-x-2 text-gray-700" key={index}>
-                            <Link href={menuItem.link}>
-                                {menuItem.icon}
-
-                                <span>{menuItem.name}</span>
+                    return (
+                        <li className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors duration-200" key={index}>
+                            <Link href={menuItem.link} className="flex items-center space-x-6">
+                                <span className="text-xl">{menuItem.icon}</span>
+                                <span className="font-medium">{menuItem.name}</span>
                             </Link>
                         </li>
-                    )
+                    );
                 })}
             </ul>
 

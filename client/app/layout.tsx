@@ -16,7 +16,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "LinkedIn Clone",
+  title: "Link'dUp",
   description: "CSC 336 Project - LinkedIn Clone",
 };
 
