@@ -60,7 +60,7 @@ const Profile = () => {
     ]
 
     return (
-        <div className='xs:hidden min-w-xs bg-white rounded-lg shadow-lg p-6'>
+        <div className='hidden md:block min-w-xs bg-white rounded-lg shadow-lg p-6'>
             {/* Profile Image/Info */}
             <div className="flex flex-col items-center">
                 <img src="https://randomuser.me/api/portraits/men/10.jpg" alt="Profile Image" className='w-24 h-24 rounded-full shadow-lg'/>

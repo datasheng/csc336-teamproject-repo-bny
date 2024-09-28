@@ -24,7 +24,7 @@ const Follow = () => {
     ]
 
   return (
-    <div className='max-w-sm rounded overflow-hidden shadow-lg bg-white p-6 mb-10'>
+    <div className='hidden md:block max-w-sm rounded overflow-hidden shadow-lg bg-white p-6 mb-10'>
       <h1 className='font-bold'>Suggested People</h1>
 
       {people.map((person, index) => {
