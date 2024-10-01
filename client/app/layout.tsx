@@ -24,7 +24,7 @@ export default function RootLayout({children,}: Readonly<{children: React.ReactN
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Header/>
+        {/* <Header/> */}
 
         {children}
       </body>
