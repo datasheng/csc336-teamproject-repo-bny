@@ -1,16 +1,20 @@
-import Profile from "@/components/left-sidebar/Profile";
-import LoginButton from "@/components/LoginLoginOutButton";
-import PostOptions from "@/components/main-section/PostOptions";
-import StoryFeed from "@/components/main-section/StoryFeed";
-import Follow from "@/components/right-sidebar/Follow";
-import News from "@/components/right-sidebar/News";
-import UserGreetText from "@/components/UserGreetText";
+"use client"
+
+import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="">
-      <UserGreetText/>
-      <LoginButton/>
+      {/* <LoginButton/> */}
+      <header className="opacity-0">
+        <nav>
+          <div className="">
+            <Link href="/">
+
+            </Link>
+          </div>
+        </nav>
+      </header>
     </div>
   );
 }

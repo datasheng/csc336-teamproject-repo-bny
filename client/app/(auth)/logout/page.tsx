@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { useEffect } from "react";
 
 const LogoutPage = () => {
@@ -8,7 +8,7 @@ const LogoutPage = () => {
 
     useEffect(() => {
         setTimeout(() => {
-            router.push("/")
+            router.push("/login")
         }, 2000);
     })
 
