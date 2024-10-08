@@ -1,5 +1,6 @@
 "use client"
 
+import { signout } from '@/lib/auth-actions'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
@@ -36,7 +37,7 @@ const Nav = () => {
                 )
             })}
 
-            <Link href="/">
+            <Link href="/logout" onClick={() => signout()}>
                 <img src="https://randomuser.me/api/portraits/men/10.jpg" alt="User" className='w-10 h-10 rounded-full'/>
             </Link>
         </nav>
