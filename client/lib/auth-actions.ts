@@ -28,6 +28,7 @@ export async function signup(formData: FormData) {
 
   const firstName = formData.get("first-name") as string;
   const lastName = formData.get("last-name") as string;
+  const username = formData.get('username') as string;
   const phoneNumber = formData.get('phone-number') as string;
 
   const data = {
@@ -36,6 +37,9 @@ export async function signup(formData: FormData) {
     options: {
       data: {
         full_name: `${firstName + " " + lastName}`,
+        first_name: firstName,
+        last_name: lastName,
+        username: username,
         email: formData.get("email") as string,
         phone_number: phoneNumber,
       },
@@ -62,7 +66,7 @@ export async function signout() {
     redirect("/error");
   }
 
-  redirect("/logout");
+  redirect("/");
 }
 
 export async function signInWithGoogle() {

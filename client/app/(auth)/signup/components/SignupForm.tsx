@@ -21,30 +21,35 @@ export function SignupForm() {
         <form action="">
             <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
+                  <div className="grid gap-2">
                     <Label htmlFor="first-name">First name</Label>
                     <Input id="first-name" name="first-name" placeholder="Max" required />
-                    </div>
+                  </div>
 
-                    <div className="grid gap-2">
+                  <div className="grid gap-2">
                     <Label htmlFor="last-name">Last name</Label>
                     <Input id="last-name" name="last-name" placeholder="Robinson" required />
-                    </div>
+                  </div>
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="example@example.com" required/>
+                  <Label htmlFor="username">Username</Label>
+                  <Input id="username" name="username" placeholder="RandomUsername123" required/>
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="phone-number">Phone Number</Label>
-                    <Input id="phone-number" name="phone-number" placeholder="(xxx)-xxx-xxxx" required/>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" name="email" type="email" placeholder="example@example.com" required/>
                 </div>
 
                 <div className="grid gap-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input id="password" name="password" type="password" />
+                  <Label htmlFor="phone-number">Phone Number</Label>
+                  <Input id="phone-number" name="phone-number" placeholder="(xxx)-xxx-xxxx" required/>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" name="password" type="password" />
                 </div>
 
                 <Button formAction={signup} type="submit" className="w-full">
@@ -55,6 +60,7 @@ export function SignupForm() {
 
         <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
+
           <Link href="/login" className="underline">
             Sign in
           </Link>
