@@ -8,6 +8,10 @@ const Navbar = () => {
             link: "/"
         },
         {
+            name: "Listings",
+            link: "/listings"
+        },
+        {
             name: "About",
             link: "/about"
         },
@@ -18,21 +22,25 @@ const Navbar = () => {
     ]
 
     return (
-      <header className="flex justify-between items-center w-full max-w-7xl px-8 py-6 mx-auto">
-        <div className="text-2xl font-bold text-black">Real Estate</div>
+      <header className="flex justify-between items-center w-full max-w-7xl px-8 py-6 mx-auto text-white">
+        <div className="text-4xl font-bold">CoSpace</div>
   
         {/* Navbar Links */}
-        <nav className="bg-transparent backdrop-blur-md px-6 py-3 rounded-full shadow-md">
-          <ul className="flex space-x-8 text-black font-medium">
+        <nav className="bg-transparent backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-md">
+          <ul className="flex space-x-8 text-white font-medium">
             {links.map((link, index) => {
-                return <Link href={link.link} key={index}>{link.name}</Link>
+                return (
+                  <li key={index} className="p-2 rounded-lg hover:bg-white hover:text-black transition-colors">
+                    <Link href={link.link}>
+                      {link.name}
+                    </Link>
+                  </li>
+                )
             })}
           </ul>
         </nav>
         
-        <button className="bg-gray-200 text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-100">
-          <Link href="/login">Login</Link>
-        </button>
+        <Link href="/login" className="bg-gray-200 text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-100">Login</Link>
       </header>
     );
   };

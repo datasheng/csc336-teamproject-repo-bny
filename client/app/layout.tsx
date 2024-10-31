@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Link'dUp",
-  description: "CSC 336 Project - LinkedIn Clone",
+  title: "CoSpace",
+  description: "CSC 336 Project - A fullstack app that allows users to find roommates",
 };
 
 export default function RootLayout({children,}: Readonly<{children: React.ReactNode;}>) {

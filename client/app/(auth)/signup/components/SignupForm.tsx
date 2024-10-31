@@ -34,7 +34,12 @@ export function SignupForm() {
 
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="m@example.com" required/>
+                    <Input id="email" name="email" type="email" placeholder="example@example.com" required/>
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="phone-number">Phone Number</Label>
+                    <Input id="phone-number" name="phone-number" placeholder="(xxx)-xxx-xxxx" required/>
                 </div>
 
                 <div className="grid gap-2">

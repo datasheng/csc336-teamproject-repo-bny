@@ -28,6 +28,7 @@ export async function signup(formData: FormData) {
 
   const firstName = formData.get("first-name") as string;
   const lastName = formData.get("last-name") as string;
+  const phoneNumber = formData.get('phone-number') as string;
 
   const data = {
     email: formData.get("email") as string,
@@ -36,6 +37,7 @@ export async function signup(formData: FormData) {
       data: {
         full_name: `${firstName + " " + lastName}`,
         email: formData.get("email") as string,
+        phone_number: phoneNumber,
       },
     },
   };
