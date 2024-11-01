@@ -15,6 +15,8 @@ import Image from "next/legacy/image";
 import Link from "next/link";
 import { BsHouseAddFill } from "react-icons/bs";
 import { FaHouseUser } from "react-icons/fa";
+import { motion } from 'framer-motion';
+import Header from "@/components/Header";
 
 const cards = [
   { 
@@ -93,17 +95,22 @@ export default function Home() {
 
   return (
     <div className="">
-      <div className="min-h-screen bg-cover bg-no-repeat" style={{backgroundImage: `url(${bgImage})`}}>
-        <Navbar/>
+      <div className="min-h-screen  bg-cover bg-no-repeat md:w-full" style={{backgroundImage: `url(${bgImage})`}}>
+        <Header/>
 
         <div className="flex flex-col items-center justify-center h-[calc(50vh-80px)] px-6">
-          <h1 className="text-8xl font-bold text-white">Welcome to CoSpace</h1>
-          <h2 className="mt-4 text-4xl text-white">Your space to find cheaper rent</h2>
+          <motion.h1 className="lg:text-7xl sm:text-5xl phone:text-4xl font-bold text-white" initial={{opacity: 0, y: -20}} animate={{opacity: 1, y: 0}} transition={{duration: 0.5}}>
+            Welcome to CoSpace
+          </motion.h1>
+          
+          <motion.h2 className="mt-4 text-4xl sm:text-2xl phone:text-2xl text-white" initial={{opacity: 0, x: -20}} animate={{opacity: 1, x: 0}} transition={{duration: 0.5}}>
+            Your space to find cheaper rent
+          </motion.h2>
           
           <SearchBar/>
         </div>
 
-        <div className="flex justify-center space-x-6">
+        <div className="hidden xl:flex justify-center space-x-6">
           {cards.map((card, index) => {
             return(
               <Link href={card.link} key={index} className="bg-white dark:bg-black flex flex-col mr-20 items-center justify-center mb-10 p-8 w-60 h-48 rounded-lg shadow-lg cursor-pointer transition-transform transform hover:scale-105 hover:bg-blue-500">

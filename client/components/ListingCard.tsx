@@ -15,7 +15,7 @@ interface PropertyCardProps{
 
 const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, rent, beds, baths, levels, sqft}) => {
   return (
-    <div className='max-w-sm rounded overflow-hidden shadow-lg border border-gray-200'>
+    <div className='max-w-sm rounded overflow-hidden shadow-lg border border-gray-200 cursor-pointer transition-transform transform hover:scale-105'>
       <div className="relative">
         <div className="">
             <Image src={imageUrl} alt={address} className='object-cover' width={400} height={300}/>
