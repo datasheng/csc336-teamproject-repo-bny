@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import DarkModeToggle from './DarkModeToggle';
 
 const links = [
   {
@@ -74,10 +75,16 @@ const Navbar = () => {
           })}
         </ul>
       </nav>
-        
-      <Link href={isLoggedIn ? "/profile" : "/login"} className="bg-gray-200 text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-100">
-        {userName || "Login"}
-      </Link>
+      
+      <div className="">
+        <div className="flex items-center space-x-4">
+          <DarkModeToggle/>
+          
+          <Link href={isLoggedIn ? "/profile" : "/login"} className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
+            {userName || "Login"}
+          </Link>
+        </div>
+      </div>
     </header>
   );
 };
