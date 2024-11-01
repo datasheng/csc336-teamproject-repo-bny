@@ -17,6 +17,7 @@ import { BsHouseAddFill } from "react-icons/bs";
 import { FaHouseUser } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import Header from "@/components/Header";
+import { useEffect, useState } from "react";
 
 const cards = [
   { 
@@ -91,11 +92,16 @@ const dummyProperties = [
 
 export default function Home() {
   const {theme} = useTheme();
-  const bgImage = theme === "dark" ? darkBg.src : lightBg.src;
+  const [bgImage, setBgImage] = useState('');
+
+  useEffect(() => {
+    const bgImage = theme === "dark" ? darkBg.src : lightBg.src;
+    setBgImage(bgImage);
+  })
 
   return (
     <div className="">
-      <div className="min-h-screen  bg-cover bg-no-repeat md:w-full" style={{backgroundImage: `url(${bgImage})`}}>
+      <div className="min-h-screen bg-cover bg-no-repeat md:w-full" style={{backgroundImage: `url(${bgImage})`}}>
         <Header/>
 
         <div className="flex flex-col items-center justify-center h-[calc(50vh-80px)] px-6">

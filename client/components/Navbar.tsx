@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import DarkModeToggle from './DarkModeToggle';
+import { DropdownMenu, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut } from './ui/dropdown-menu';
+import {LogOutIcon, Settings, User} from "lucide-react";
+import { FaMessage } from "react-icons/fa6";
 
 const links = [
   {
@@ -29,6 +33,9 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
+  const [isDropdownOpen, setIsDropDownOpen] = useState(false);
+
+  const toggleDropdown = () => setIsDropDownOpen(!isDropdownOpen);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -37,6 +44,7 @@ const Navbar = () => {
       if (session) {
         const name = session.user.user_metadata?.username || session.user.email; // Use name if available, otherwise email
         setUserName(name);
+        setIsLoggedIn(true);
       } else {
         setUserName(null);
       }
@@ -79,10 +87,51 @@ const Navbar = () => {
       <div className="">
         <div className="flex items-center space-x-4">
           <DarkModeToggle/>
-          
-          <Link href={isLoggedIn ? "/profile" : "/login"} className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
-            {userName || "Login"}
-          </Link>
+
+          {isLoggedIn && userName ? (
+            <>
+              <div className="bg-white text-black dark:bg-black dark:text-white rounded-md p-3 cursor-pointer">
+                <Link href="/chat">
+                  <FaMessage/>
+                </Link>
+              </div>
+
+              <DropdownMenu >
+                <DropdownMenuTrigger asChild>
+                  <button onClick={toggleDropdown} className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
+                    {userName}
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent className='w-56'>
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator/>
+
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem>
+                      <User/>
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem>
+                      <Settings/>
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem>
+                      <LogOutIcon/>
+                      <Link href="/logout" onClick={() => signout()}>Logout</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <Link href="/login" className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
+              Login
+            </Link>
+          )}
+        
         </div>
       </div>
     </header>
