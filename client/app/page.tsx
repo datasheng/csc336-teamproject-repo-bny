@@ -5,8 +5,13 @@ import Navbar from "@/components/Navbar";
 import SearchBar from "@/components/SearchBar";
 import lightBg from "@/public/images/homepageBackground.jpeg";
 import darkBg from "@/public/images/homePageBackgroundImageDark.jpg";
+import property1 from "@/public/images/propertyImages/property1.jpg"
+import property2 from "@/public/images/propertyImages/property2.jpg"
+import property3 from "@/public/images/propertyImages/property3.jpg"
+import property4 from "@/public/images/propertyImages/property4.jpg"
+import property5 from "@/public/images/propertyImages/property5.jpg"
 import { useTheme } from "next-themes";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Link from "next/link";
 import { BsHouseAddFill } from "react-icons/bs";
 import { FaHouseUser } from "react-icons/fa";
@@ -26,7 +31,7 @@ const cards = [
 
 const dummyProperties = [
   {
-    imageUrl: '/images/propertyImages/property1.jpg',
+    imageUrl: property1,
     status: "Looking",
     address: '17081 Perry Street',
     location: 'San Francisco, CA, USA',
@@ -37,7 +42,7 @@ const dummyProperties = [
     sqft: 1234,
   },
   {
-    imageUrl: '/images/propertyImages/property2.jpg',
+    imageUrl: property2,
     status: 'Not Looking',
     address: '2134 Maple Avenue',
     location: 'Los Angeles, CA, USA',
@@ -48,33 +53,33 @@ const dummyProperties = [
     sqft: 980,
   },
   {
-    imageUrl: '/images/propertyImages/property3.jpg',
+    imageUrl: property3,
     status: 'Looking',
     address: '789 Willow Lane',
     location: 'Seattle, WA, USA',
-    price: 2700,
+    rent: 2700,
     beds: 3,
     baths: 2,
     levels: 1,
     sqft: 1500,
   },
   {
-    imageUrl: '/images/propertyImages/property4.jpg',
+    imageUrl: property4,
     status: 'Looking',
     address: '305 Elm St',
     location: 'Austin, TX, USA',
-    price: 3500,
+    rent: 3500,
     beds: 5,
     baths: 3,
     levels: 2,
     sqft: 2100,
   },
   {
-    imageUrl: '/images/propertyImages/property5.jpg',
+    imageUrl: property5,
     status: 'Not Looking',
     address: '456 Oak Avenue',
     location: 'Chicago, IL, USA',
-    price: 1800,
+    rent: 1800,
     beds: 2,
     baths: 1,
     levels: 1,
@@ -88,7 +93,7 @@ export default function Home() {
 
   return (
     <div className="">
-      <div className="min-h-screen bg-cover bg-no-repeat" style={{backgroundImage: `url(${bgImage})`, imageRendering: "auto"}}>
+      <div className="min-h-screen bg-cover bg-no-repeat" style={{backgroundImage: `url(${bgImage})`}}>
         <Navbar/>
 
         <div className="flex flex-col items-center justify-center h-[calc(50vh-80px)] px-6">
@@ -114,10 +119,10 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex justify-center mt-8">
-        <h1 className="text-6xl">Listings</h1>
+      <div className="flex flex-col items-center mt-8">
+        <h1 className="text-6xl font-bold">Listings</h1>
 
-        <div className="grid grid-cols-1 md:grids-cols-2 lg:grid-cols-3 gap-8 mt-12">
+        <div className="grid grid-cols-1 md:grids-cols-2 lg:grid-cols-3 gap-8 mt-12 mb-10">
           {dummyProperties.map((property, index) => {
             return(
               <ListingCard key={index} {...property}/>
@@ -126,6 +131,5 @@ export default function Home() {
         </div>
       </div>
     </div>
-
   );
 }

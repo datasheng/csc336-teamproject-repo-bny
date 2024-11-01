@@ -1,9 +1,10 @@
-import Image from 'next/image';
+import { StaticImageData } from "next/image";
+import Image from "next/legacy/image";
 import React from 'react'
 
 interface PropertyCardProps{
-    imageUrl: string;
-    status: 'Looking' | 'Not Looking';
+    imageUrl: StaticImageData;
+    status: string;
     address: string;
     rent: number;
     beds: number;
@@ -16,7 +17,9 @@ const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, re
   return (
     <div className='max-w-sm rounded overflow-hidden shadow-lg border border-gray-200'>
       <div className="relative">
-        <Image src={imageUrl} alt={address} className='w-full h-48 object-cover' layout='fill'/>
+        <div className="">
+            <Image src={imageUrl} alt={address} className='object-cover' width={400} height={300}/>
+        </div>
 
         <span className='absolute top-2 left-2 bgred-600 text-white font-bold px-3 py-1 rounded'>
             {status}
@@ -25,12 +28,12 @@ const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, re
 
       <div className="p-4">
         <h2 className='text-2xl font-semibold'>{address}</h2>
-        <p className='text-lg font-bold mt-2'>{rent}</p>
+        <p className='text-lg font-bold mt-2'>${rent}</p>
       </div>
 
       <div className="border-t border-gray-200 my-2 mx-4"></div>
 
-      <div className="flex justify-between px-4 pb-4 text-center text-gray-700">
+      <div className="flex justify-between px-4 pb-4 text-center text-gray-700 dark:text-white">
         <div className="">
             <p className='text-sm'>Beds</p>
             <p className='font-semibold'>{beds}</p>
