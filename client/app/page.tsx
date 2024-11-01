@@ -1,6 +1,7 @@
 "use client"
 
 import Navbar from "@/components/Navbar";
+import SearchBar from "@/components/SearchBar";
 import bg from "@/public/images/homepageBackground.jpeg"
 import Image from "next/image";
 import Link from "next/link";
@@ -28,6 +29,8 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center h-[calc(50vh-80px)] px-6">
         <h1 className="text-8xl font-bold text-white">Welcome to CoSpace</h1>
         <h2 className="mt-4 text-4xl text-white">Your space to find cheaper rent</h2>
+        
+        <SearchBar/>
       </div>
 
       <div className="flex justify-center space-x-6">
