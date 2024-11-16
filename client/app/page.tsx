@@ -1,98 +1,50 @@
 "use client"
 
 import ListingCard from "@/components/ListingCard";
-import Navbar from "@/components/Navbar";
 import SearchBar from "@/components/SearchBar";
 import lightBg from "@/public/images/homepageBackground.jpeg";
 import darkBg from "@/public/images/homePageBackgroundImageDark.jpg";
-import property1 from "@/public/images/propertyImages/property1.jpg"
-import property2 from "@/public/images/propertyImages/property2.jpg"
-import property3 from "@/public/images/propertyImages/property3.jpg"
-import property4 from "@/public/images/propertyImages/property4.jpg"
-import property5 from "@/public/images/propertyImages/property5.jpg"
 import { useTheme } from "next-themes";
-import Image from "next/legacy/image";
 import Link from "next/link";
 import { BsHouseAddFill } from "react-icons/bs";
 import { FaHouseUser } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 const cards = [
   { 
     title: "List a property", 
     icon: <BsHouseAddFill size={48}/>, 
-    link: "/list"
+    link: "/post"
   },
   { 
     title: "Find a place", 
     icon: <FaHouseUser size={48}/>, 
-    link: "listings"
+    link: "/listings"
   }
 ]
 
-const dummyProperties = [
-  {
-    imageUrl: property1,
-    status: "Looking",
-    address: '17081 Perry Street',
-    location: 'San Francisco, CA, USA',
-    rent: 3000,
-    beds: 4,
-    baths: 2,
-    levels: 3,
-    sqft: 1234,
-  },
-  {
-    imageUrl: property2,
-    status: 'Not Looking',
-    address: '2134 Maple Avenue',
-    location: 'Los Angeles, CA, USA',
-    rent: 2500,
-    beds: 3,
-    baths: 2,
-    levels: 2,
-    sqft: 980,
-  },
-  {
-    imageUrl: property3,
-    status: 'Looking',
-    address: '789 Willow Lane',
-    location: 'Seattle, WA, USA',
-    rent: 2700,
-    beds: 3,
-    baths: 2,
-    levels: 1,
-    sqft: 1500,
-  },
-  {
-    imageUrl: property4,
-    status: 'Looking',
-    address: '305 Elm St',
-    location: 'Austin, TX, USA',
-    rent: 3500,
-    beds: 5,
-    baths: 3,
-    levels: 2,
-    sqft: 2100,
-  },
-  {
-    imageUrl: property5,
-    status: 'Not Looking',
-    address: '456 Oak Avenue',
-    location: 'Chicago, IL, USA',
-    rent: 1800,
-    beds: 2,
-    baths: 1,
-    levels: 1,
-    sqft: 850,
-  },
-]
-
 export default function Home() {
-  const {theme} = useTheme();
   const [bgImage, setBgImage] = useState('');
+  const [listings, setListings] = useState<any[]>([]);
+  const {theme} = useTheme();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchListings = async() => {
+      const {data, error} = await supabase.from('listings').select('listing_id, title, description, address, status, rent, max_roommates, beds, baths, levels, sqft').order('created_at', {ascending: false})
+
+      if(error){
+        console.error('Error fetching listings: ', error);
+      }else{
+        setListings(data || [])
+      }
+    }
+
+    fetchListings();
+  }, [supabase])
 
   useEffect(() => {
     const bgImage = theme === "dark" ? darkBg.src : lightBg.src;
@@ -133,14 +85,18 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col items-center mt-8">
-        <h1 className="text-6xl font-bold">Listings</h1>
+        <motion.h1 className="text-6xl font-bold"  initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} viewport={{ once: true }}>
+          Listings
+        </motion.h1>
 
         <div className="grid grid-cols-1 md:grids-cols-2 lg:grid-cols-3 gap-8 mt-12 mb-10">
-          {dummyProperties.map((property, index) => {
+          {/* {listings.map((property, index) => {
             return(
-              <ListingCard key={index} {...property}/>
+              <motion.div key={index} initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.1 }} viewport={{ once: true }}>
+                <ListingCard {...property} />
+              </motion.div>
             )
-          })}
+          })} */}
         </div>
       </div>
     </div>

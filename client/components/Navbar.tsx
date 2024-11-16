@@ -37,6 +37,13 @@ const Navbar = () => {
 
   const toggleDropdown = () => setIsDropDownOpen(!isDropdownOpen);
 
+  const signUserOut = () => {
+    signout();
+    setUserName(null); 
+    setIsLoggedIn(false);
+    router.push('/');
+  }
+
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -66,11 +73,15 @@ const Navbar = () => {
   }, [userName])
 
   return (
-    <header className="flex justify-between items-center w-full max-w-7xl px-8 py-6 mx-auto text-white">
-      <div className="text-4xl font-bold">CoSpace</div>
+    <header className="flex justify-between items-center w-full max-w-7xl px-8 py-7 mx-auto text-white">
+      <h1 className="text-4xl font-bold cursor-pointer">
+        <Link href="/">
+          CoSpace
+        </Link>
+      </h1>
   
       {/* Navbar Links */}
-      <nav className="bg-transparent backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-md">
+      <nav className="bg-transparent backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-md ml-12">
         <ul className="flex space-x-8 text-white font-medium">
           {links.map((link, index) => {
             return (
@@ -83,56 +94,53 @@ const Navbar = () => {
           })}
         </ul>
       </nav>
-      
-      <div className="">
-        <div className="flex items-center space-x-4">
-          <DarkModeToggle/>
 
-          {isLoggedIn && userName ? (
-            <>
-              <div className="bg-white text-black dark:bg-black dark:text-white rounded-md p-3 cursor-pointer">
-                <Link href="/chat">
-                  <FaMessage/>
-                </Link>
-              </div>
+      <div className="flex items-center space-x-4">
+        <DarkModeToggle/>
 
-              <DropdownMenu >
-                <DropdownMenuTrigger asChild>
-                  <button onClick={toggleDropdown} className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
-                    {userName}
-                  </button>
-                </DropdownMenuTrigger>
+        {isLoggedIn && userName ? (
+          <>
+            <div className="bg-white text-black dark:bg-black dark:text-white rounded-md p-3 cursor-pointer">
+              <Link href="/chat">
+                <FaMessage/>
+              </Link>
+            </div>
 
-                <DropdownMenuContent className='w-56'>
-                  <DropdownMenuLabel>Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator/>
+            <DropdownMenu >
+              <DropdownMenuTrigger asChild>
+                <button onClick={toggleDropdown} className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
+                  {userName}
+                </button>
+              </DropdownMenuTrigger>
 
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                      <User/>
-                      <span>Profile</span>
-                    </DropdownMenuItem>
+              <DropdownMenuContent className='w-56'>
+                <DropdownMenuLabel>Account</DropdownMenuLabel>
+                <DropdownMenuSeparator/>
 
-                    <DropdownMenuItem>
-                      <Settings/>
-                      <span>Settings</span>
-                    </DropdownMenuItem>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <User/>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
 
-                    <DropdownMenuItem>
-                      <LogOutIcon/>
-                      <Link href="/logout" onClick={() => signout()}>Logout</Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          ) : (
-            <Link href="/login" className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
-              Login
-            </Link>
-          )}
-        
-        </div>
+                  <DropdownMenuItem>
+                    <Settings/>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem>
+                    <LogOutIcon/>
+                    <Link href="/logout" onClick={() => signUserOut()}>Logout</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        ) : (
+          <Link href="/login" className="bg-gray-200 dark:bg-black dark:text-white text-black font-bold py-2 px-4 rounded-lg hover:bg-indigo-200">
+            Login
+          </Link>
+        )}
       </div>
     </header>
   );
