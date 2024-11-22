@@ -22,8 +22,9 @@ const ListingsPage = () => {
   }, [router])
 
   return (
-    <>
-    </>
+    <div className="flex min-h-screen">
+      <Listingpage imageUrl={["/placeholder.jpg","/placeholder.jpg" ]} status={"Available"} address={"34-92 54th street"} rent={3423} beds={2} baths={2} levels={2} sqft={1500} description='frwdbkfhbeb' />
+    </div>
   )
 }
 

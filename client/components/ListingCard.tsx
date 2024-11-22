@@ -30,12 +30,12 @@ const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, re
     <div className='max-w-sm rounded overflow-hidden shadow-lg border border-gray-200 cursor-pointer transition-transform transform hover:scale-105'>
       <div className="relative">
         {imageUrl.length > 0 ? (
-          <Image src={imageUrl[currentIdx]} alt={`{Image ${currentIdx  + 1}}`} className="object-cover w-full h-full" width={400} height={300} fill priority/>
+          <Image src={imageUrl[currentIdx]} alt={`{Image ${currentIdx  + 1}}`} className="object-cover w-full h-full" width={400} height={300} priority/>
         ) : (
           <Image src='/placeholder.jpg' alt="PlaceHolder" className="object-fill" width={400} height={300} priority/>
         )}
 
-        <span className='absolute top-2 left-2 bgred-600 text-white font-bold px-3 py-1 rounded'>
+        <span className='absolute top-2 left-2 bg-red-600 text-white font-bold px-3 py-1 rounded'>
             {status}
         </span>
         
@@ -53,7 +53,7 @@ const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, re
 
       <div className="p-4">
         <h2 className='text-2xl font-semibold'>{address}</h2>
-        <p className='text-lg font-bold mt-2'>${rent}</p>
+        <p className='text-lg font-bold mt-2 text-red-600'>${rent}</p>
       </div>
 
       <div className="border-t border-gray-200 my-2 mx-4"></div>

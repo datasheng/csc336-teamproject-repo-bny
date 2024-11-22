@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
+import Navbar from "@/components/Navbar";
 
 const cards = [
   { 
@@ -54,7 +55,9 @@ export default function Home() {
   return (
     <div className="">
       <div className="min-h-screen bg-cover bg-no-repeat md:w-full" style={{backgroundImage: `url(${bgImage})`}}>
-        <Header/>
+        {//<Header/>
+        //<Navbar/>
+}
 
         <div className="flex flex-col items-center justify-center h-[calc(50vh-80px)] px-6">
           <motion.h1 className="lg:text-7xl sm:text-5xl phone:text-4xl font-bold text-white" initial={{opacity: 0, y: -20}} animate={{opacity: 1, y: 0}} transition={{duration: 0.5}}>
