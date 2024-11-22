@@ -1,3 +1,4 @@
+"use client"
 import { signout } from '@/lib/auth-actions';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
