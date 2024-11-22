@@ -1,11 +1,31 @@
-import React from 'react'
+"use client"
+
+import Listingpage from '@/components/Listingpage';
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react'
 
 const ListingsPage = () => {
-  return (
-    <div>
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    const checkUser = async() => {
+      const {data: {session} } = await supabase.auth.getSession();
       
-    </div>
+      if(!session){
+        router.push('/login');
+      };
+    };
+
+    checkUser();
+  }, [router])
+
+  return (
+    <>
+    </>
   )
 }
 
 export default ListingsPage;
+
