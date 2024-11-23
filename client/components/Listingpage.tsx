@@ -1,6 +1,7 @@
 "use client"
 import Image from "next/legacy/image";
 import React, { useState } from 'react';
+import { Button } from "./ui/button";
 
 interface PropertyCardProps {
   imageUrl: string[];
@@ -85,7 +86,10 @@ const Listingpage: React.FC<PropertyCardProps> = ({
 
         {/* Right side - Property Info */}
         <div className="md:w-1/2 p-6">
-          <h2 className='text-3xl font-semibold mb-4'>{address}</h2>
+          <div className="flex flex-row">
+            <h2 className='text-3xl flex flex-start font-semibold mb-4'>{address}</h2>
+            <Button className="ml-72">Message</Button>
+          </div>
           <p className='text-2xl font-bold text-red-600 mb-6'>${rent.toLocaleString()}/month</p>
           
           <div className="grid grid-cols-4 gap-4 mb-6">
@@ -111,7 +115,7 @@ const Listingpage: React.FC<PropertyCardProps> = ({
           {description && (
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-2">Description</h3>
-              <p className="text-gray-700 leading-relaxed">{description}</p>
+              <p className="text-white leading-relaxed">{description}</p>
             </div>
           )}
         </div>
