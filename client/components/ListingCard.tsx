@@ -12,6 +12,7 @@ interface PropertyCardProps{
     baths: number;
     levels: number;
     sqft: number;
+    author: string;
 }
 
 const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, rent, beds, baths, levels, sqft}) => {
