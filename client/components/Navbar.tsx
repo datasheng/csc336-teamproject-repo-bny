@@ -74,7 +74,7 @@ const Navbar = () => {
   }, [userName])
 
   return (
-    <header className="flex justify-between items-center w-full max-w-7xl px-8 py-7 mx-auto text-white">
+    <header className="flex justify-between items-center w-full max-w-7xl px-8 py-7 mx-auto text-black dark:text-white">
       <h1 className="text-4xl font-bold cursor-pointer">
         <Link href="/">
           CoSpace
@@ -86,7 +86,7 @@ const Navbar = () => {
         <ul className="flex space-x-8 text-white font-medium">
           {links.map((link, index) => {
             return (
-              <li key={index} className="p-2 rounded-lg hover:bg-white hover:text-black transition-colors">
+              <li key={index} className="p-2 rounded-lg text-black dark:text-white hover:bg-white dark:hover:text-black transition-colors">
                 <Link href={link.link}>
                   {link.name}
                 </Link>
@@ -121,7 +121,7 @@ const Navbar = () => {
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
                     <User/>
-                    <Link href="/profile">Profile</Link>
+                    <Link href={`/user/${userName}`}>Profile</Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuItem>

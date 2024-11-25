@@ -32,6 +32,11 @@ export default function Home() {
   const [listings, setListings] = useState<any[]>([]);
   const {theme} = useTheme();
   const supabase = createClient();
+  
+
+  const viewListing = () => {
+    alert("Test")
+  }
 
   useEffect(() => {
     const fetchListings = async() => {
@@ -85,21 +90,23 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center mt-8">
+      {/* <div className="flex flex-col items-center mt-8">
         <motion.h1 className="text-6xl font-bold"  initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} viewport={{ once: true }}>
           Listings
         </motion.h1>
 
         <div className="grid grid-cols-1 md:grids-cols-2 lg:grid-cols-3 gap-8 mt-12 mb-10">
-          {/* {listings.map((property, index) => {
+          {listings.map((property, index) => {
             return(
               <motion.div key={index} initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.1 }} viewport={{ once: true }}>
-                <ListingCard {...property} />
+                <Link href={`/listings/${property.listing_id}`}>
+                  <ListingCard {...property}/>
+                </Link>
               </motion.div>
             )
-          })} */}
+          })}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

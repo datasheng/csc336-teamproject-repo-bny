@@ -4,9 +4,9 @@ import MobileNav from './MobileNav';
 
 const Header = () => {
   return (
-    <header className='py-8 xl:py-1 text-white'>
+    <header className='py-8 xl:py-1 text-black dark:text-white'>
         <div className="hidden lg:flex items-center gap-8">
-            <Navbar/>
+          <Navbar/>
         </div>
 
       <div className="lg:hidden">

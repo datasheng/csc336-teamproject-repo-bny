@@ -19,7 +19,7 @@ interface PropertyCardProps {
   listingId: string;  // This should be a UUID
 }
 
-const Listingpage: React.FC<PropertyCardProps> = ({
+const ListingPage: React.FC<PropertyCardProps> = ({
   imageUrl, 
   status, 
   address, 
@@ -232,4 +232,4 @@ const Listingpage: React.FC<PropertyCardProps> = ({
   );
 };
 
-export default Listingpage;
+export default ListingPage;

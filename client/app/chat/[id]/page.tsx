@@ -205,6 +205,7 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
                 )}
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-2 border-gray-800"></div>
               </div>
+              
               <div>
                 <h2 className="text-2xl font-semibold text-gray-100">{recipientName}</h2>
                 <p className="text-sm text-gray-400">Active now</p>

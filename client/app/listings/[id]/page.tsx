@@ -1,5 +1,6 @@
 "use client"
-import Listingpage from '@/components/Listingpage';
+
+import ListingPage from '@/components/ListingPage';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -72,7 +73,7 @@ const ListingsPage = () => {
 
   return (
     <div className="flex min-h-screen">
-      <Listingpage 
+      <ListingPage 
         imageUrl={listing.listing_photo_id ? [listing.listing_photo_id] : ["/placeholder.jpg"]}
         status={listing.status}
         address={listing.address}
