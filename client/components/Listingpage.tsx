@@ -1,7 +1,9 @@
 "use client"
 import Image from "next/legacy/image";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from "./ui/button";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface PropertyCardProps {
   imageUrl: string[];
@@ -13,6 +15,8 @@ interface PropertyCardProps {
   levels: number;
   sqft: number;
   description?: string;
+  author: string;  // This should be a UUID
+  listingId: string;  // This should be a UUID
 }
 
 const Listingpage: React.FC<PropertyCardProps> = ({
@@ -24,9 +28,30 @@ const Listingpage: React.FC<PropertyCardProps> = ({
   baths, 
   levels, 
   sqft,
-  description
+  description,
+  author,
+  listingId
 }) => {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
+  const router = useRouter();
+  console.log('author', author);
+  console.log('listingId', listingId);
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error('Error fetching user:', error);
+        return;
+      }
+      setUser(user);
+    }
+
+    fetchUser();
+  }, [supabase]);
 
   const handleNext = () => {
     setCurrentIdx((prevIdx) => (prevIdx + 1) % imageUrl.length);
@@ -36,8 +61,70 @@ const Listingpage: React.FC<PropertyCardProps> = ({
     setCurrentIdx((prevIdx) => prevIdx === 0 ? imageUrl.length - 1 : prevIdx - 1);
   };
 
+  const initiateMessage = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Validate required fields
+      if (!user?.id) {
+        setError('Please log in to send messages');
+        return;
+      }
+
+      if (!listingId || !author) {
+        setError('Invalid listing information');
+        return;
+      }
+
+      // Check if a chat already exists
+      const { data: existingChat, error: chatError } = await supabase
+        .from('chat')
+        .select('chat_id')
+        .eq('listing_id', listingId)
+        .eq('host_id', author)
+        .eq('roommate_id', user.id)
+        .single();
+
+      if (chatError && chatError.code !== 'PGRST116') { // PGRST116 is "not found" error
+        throw new Error(`Error checking existing chat: ${chatError.message}`);
+      }
+
+      if (existingChat) {
+        // Chat exists, navigate to it
+        router.push(`/chat/${existingChat.chat_id}`);
+      } else {
+        // Create new chat
+        const { data: newChat, error: createError } = await supabase
+          .from('chat')
+          .insert([{
+            listing_id: listingId,
+            host_id: author,
+            roommate_id: user.id,
+            host_matched: false,
+            roommate_matched: false
+          }])
+          .select()
+          .single();
+
+        if (createError) {
+          throw new Error(`Error creating chat: ${createError.message}`);
+        }
+
+        if (newChat) {
+          router.push(`/chat/${newChat.chat_id}`);
+        }
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className='w-full rounded-lg overflow-hidden shadow-lg  hover:shadow-xl transition-shadow m-16'>
+    <div className='w-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow m-16'>
       <div className="flex flex-col md:flex-row">
         {/* Left side - Images */}
         <div className="md:w-1/2 relative h-[400px]">
@@ -86,10 +173,21 @@ const Listingpage: React.FC<PropertyCardProps> = ({
 
         {/* Right side - Property Info */}
         <div className="md:w-1/2 p-6">
-          <div className="flex flex-row">
-            <h2 className='text-3xl flex flex-start font-semibold mb-4'>{address}</h2>
-            <Button className="ml-72">Message</Button>
+          <div className="flex flex-row justify-between items-center">
+            <h2 className='text-3xl font-semibold mb-4'>{address}</h2>
+            <Button 
+              onClick={initiateMessage}
+              disabled={isLoading || !user}
+              className="min-w-[100px]"
+            >
+              {isLoading ? 'Loading...' : 'Message'}
+            </Button>
           </div>
+          
+          {error && (
+            <div className="text-red-500 mb-4">{error}</div>
+          )}
+          
           <p className='text-2xl font-bold text-red-600 mb-6'>${rent.toLocaleString()}/month</p>
           
           <div className="grid grid-cols-4 gap-4 mb-6">
@@ -111,11 +209,10 @@ const Listingpage: React.FC<PropertyCardProps> = ({
             </div>
           </div>
 
-          {/* Description section */}
           {description && (
             <div className="mt-6">
               <h3 className="text-xl font-semibold mb-2">Description</h3>
-              <p className="text-white leading-relaxed">{description}</p>
+              <p className="text-gray-700 leading-relaxed">{description}</p>
             </div>
           )}
         </div>
