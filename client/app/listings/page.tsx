@@ -2,6 +2,7 @@
 import { createClient } from '@/utils/supabase/server';
 import ListingCard from '@/components/ListingCard';
 import Link from 'next/link';
+import Header from '@/components/Header';
 
 const ListingsPage = async () => {
   const supabase = await createClient();
@@ -10,6 +11,8 @@ const ListingsPage = async () => {
   
   return (
     <div className="container mx-auto px-4">
+      <Header/>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {data && data?.map((listing: any) => {
           return (

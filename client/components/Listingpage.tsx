@@ -38,15 +38,19 @@ const Listingpage: React.FC<PropertyCardProps> = ({
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
   const router = useRouter();
-  console.log('author', author);
-  console.log('listingId', listingId);
+
+  // console.log('author', author);
+  // console.log('listingId', listingId);
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
+
       if (error) {
         console.error('Error fetching user:', error);
         return;
       }
+      
       setUser(user);
     }
 
@@ -175,13 +179,20 @@ const Listingpage: React.FC<PropertyCardProps> = ({
         <div className="md:w-1/2 p-6">
           <div className="flex flex-row justify-between items-center">
             <h2 className='text-3xl font-semibold mb-4'>{address}</h2>
-            <Button 
-              onClick={initiateMessage}
-              disabled={isLoading || !user}
-              className="min-w-[100px]"
-            >
-              {isLoading ? 'Loading...' : 'Message'}
-            </Button>
+
+            {user?.id === author ? (
+              <div className="">
+                
+              </div>
+            ) :(
+                <Button 
+                onClick={initiateMessage}
+                disabled={isLoading || !user}
+                className="min-w-[100px]"
+              >
+                {isLoading ? 'Loading...' : 'Message'}
+              </Button>
+            )}
           </div>
           
           {error && (

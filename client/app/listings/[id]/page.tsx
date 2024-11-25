@@ -34,7 +34,6 @@ const ListingsPage = () => {
         const { data: { user } } = await supabase.auth.getUser();
 
         // Fetch listing data based on id
-        
         const { data: listingData, error } = await supabase
           .from('listings')
           .select('*')
