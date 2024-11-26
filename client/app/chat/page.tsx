@@ -18,12 +18,6 @@ interface Chat {
   };
 }
 
-interface UserData {
-  user_id: string;
-  full_name: string;
-  avatar_url: string;
-}
-
 function ChatsPage() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [user, setUser] = useState<any>(null);
@@ -45,14 +39,15 @@ function ChatsPage() {
         
         setUser(user);
 
-        // First fetch chats with basic data
-        const { data: chatsData, error: chatError } = await supabase
+        // Updated query to fetch both host and roommate information
+        const { data, error: chatError } = await supabase
           .from('chat')
           .select(`
             chat_id,
             listing_id (address),
             host_id,
-            roommate_id (user_id, full_name, avatar_url),
+            host:host_id (user_id, full_name, avatar_url),
+            roommate:roommate_id (user_id, full_name, avatar_url),
             messages (
               content,
               created_at
@@ -63,45 +58,23 @@ function ChatsPage() {
 
         if (chatError) throw chatError;
 
-        // Get unique host IDs
-        const hostIds = [...new Set(chatsData
-          .map(chat => chat.host_id)
-          .filter(id => id !== null))];
+        
 
-        // Fetch host user data
-        const { data: hostsData, error: hostsError } = await supabase
-          .from('user')
-          .select('user_id, full_name, avatar_url')
-          .in('user_id', hostIds);
-
-        if (hostsError) throw hostsError;
-
-        // Create a map of host data for easy lookup
-        const hostMap = new Map(hostsData.map(host => [host.user_id, host]));
-
-        const formattedChats = chatsData.map(chat => {
-          const isCurrentUserHost = chat.host_id === user.id;
-          let otherUser: UserData;
-
-          if (isCurrentUserHost) {
-            otherUser = chat.roommate_id;
-          } else {
-            const hostData = hostMap.get(chat.host_id);
-            otherUser = {
-              user_id: chat.host_id,
-              full_name: hostData?.full_name || 'Unknown User',
-              avatar_url: hostData?.avatar_url || '/default-avatar.png'
-            };
-          }
+        const formattedChats = data.map(chat => {
+          // Determine if current user is host or roommate
+          const isHost = chat.host?.user_id === user.id;
+          
+          // Select the other user's information accordingly
+          const otherUser = isHost ? chat.roommate : chat.host;
           
           // Get the latest message if available
           const latestMessage = chat.messages?.[0];
 
           return {
             chat_id: chat.chat_id,
-            other_user_id: otherUser.user_id,
-            other_user_name: otherUser.full_name,
-            other_user_avatar: otherUser.avatar_url || '/default-avatar.png',
+            other_user_id: otherUser?.user_id,
+            other_user_name: otherUser?.full_name || 'Unknown User',
+            other_user_avatar: otherUser?.avatar_url || '/default-avatar.png',
             listing_address: chat.listing_id?.address,
             latest_message: latestMessage ? {
               content: latestMessage.content,
