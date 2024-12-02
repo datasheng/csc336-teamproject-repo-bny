@@ -29,8 +29,8 @@ export default function ChatsPage() {
         .select(`
           chat_id,
           listing_id (address),
-          host_id (user_id, full_name, avatar_url),
-          roommate_id (user_id, full_name, avatar_url)
+          host_id: users(user_id, full_name, avatar_url),
+          roommate_id: users(user_id, full_name, avatar_url)
         `)
         .or(`host_id.eq.${user.id},roommate_id.eq.${user.id}`);
 
@@ -39,16 +39,18 @@ export default function ChatsPage() {
         setLoading(false);
         return;
       }
+
       console.log(data)
+
       const formattedChats = data.map(chat => {
         const isCurrentUser = chat.host_id.user_id === user.id;
         const otherUser = isCurrentUser ? chat.roommate_id : chat.host_id;
 
         return {
           chat_id: chat.chat_id,
-          other_user_id: otherUser.user_id,
-          other_user_name: otherUser.full_name,
-          other_user_avatar: otherUser.avatar_url || '/default-avatar.png',
+          other_user_id: otherUser?.user_id,
+          other_user_name: otherUser?.full_name,
+          other_user_avatar: otherUser?.avatar_url || '/default-avatar.png',
           listing_address: chat.listing_id?.address
         };
       })
@@ -64,6 +66,7 @@ export default function ChatsPage() {
   };
 
   if (loading) return <div>Loading chats...</div>;
+
   if (chats.length === 0) return <div>No active chats</div>;
 
   return (
@@ -85,8 +88,10 @@ export default function ChatsPage() {
                 className="rounded-full"
               />
             </div>
+            
             <div className="flex-grow">
               <h2 className="text-lg font-semibold">{chat.other_user_name}</h2>
+
               {chat.listing_address && (
                 <p className="text-sm text-gray-500">{chat.listing_address}</p>
               )}

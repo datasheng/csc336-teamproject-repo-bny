@@ -89,7 +89,7 @@ const UserPage = () => {
     };
 
     if (userName) {
-      fetchProfileAndListings();
+      fetchProfileAndListings();++
     }
   }, [userName, supabase]);
 

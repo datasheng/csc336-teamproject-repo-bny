@@ -58,8 +58,6 @@ function ChatsPage() {
 
         if (chatError) throw chatError;
 
-        
-
         const formattedChats = data.map(chat => {
           // Determine if current user is host or roommate
           const isHost = chat.host?.user_id === user.id;
@@ -105,9 +103,11 @@ function ChatsPage() {
         <div className="h-8 w-48 mb-6">
           <Skeleton className="h-full w-full" />
         </div>
+
         {[1, 2, 3].map((n) => (
           <div key={n} className="flex items-center space-x-4">
             <Skeleton className="h-12 w-12 rounded-full" />
+
             <div className="space-y-2">
               <Skeleton className="h-4 w-[200px]" />
               <Skeleton className="h-4 w-[300px]" />
