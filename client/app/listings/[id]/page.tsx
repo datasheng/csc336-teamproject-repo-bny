@@ -1,6 +1,6 @@
 "use client"
 
-import ListingPage from '@/components/ListingPage';
+import ListingPage from '@/components/Listingpage';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'

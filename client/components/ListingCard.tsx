@@ -1,5 +1,6 @@
 "use client"
 
+import { createClient } from "@/utils/supabase/client";
 import Image from "next/legacy/image";
 import React, { useState } from 'react'
 
@@ -17,6 +18,22 @@ interface PropertyCardProps{
 
 const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, rent, beds, baths, levels, sqft}) => {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const supabase = createClient();
+  
+  const fetchImages = async(listingId: string) => {
+    const {data, error} = await supabase.storage.from('listing-photos').list(listingId);
+
+    if(error){
+      console.error('Error fetching images: ', error);
+      return []
+    }
+
+    const imageURLs = data.map((file) => {
+      return supabase.storage.from('listing-photos').getPublicUrl(file.name).publicURL;
+    });
+
+    return imageURLs;
+  }
 
   const handleNext = () => {
     setCurrentIdx((prevIdx) => (prevIdx + 1) % imageUrl.length);

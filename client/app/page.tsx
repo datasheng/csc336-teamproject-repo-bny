@@ -33,11 +33,6 @@ export default function Home() {
   const {theme} = useTheme();
   const supabase = createClient();
   
-
-  const viewListing = () => {
-    alert("Test")
-  }
-
   useEffect(() => {
     const fetchListings = async() => {
       const {data, error} = await supabase.from('listings').select('listing_id, title, description, address, status, rent, max_roommates, beds, baths, levels, sqft').order('created_at', {ascending: false})

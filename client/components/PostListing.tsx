@@ -7,6 +7,7 @@ import { FileUpload } from './ui/file-upload';
 import useUser from '@/utils/useUser';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import {v4 as uuidv4} from 'uuid';
 
 const labels = [
   {id: "title", name: "Title", type: "text"},
@@ -71,15 +72,46 @@ const PostListing = () => {
       const {data: listingData, error} = await supabase.from('listings').insert({
         ...formData,
         author_id: user.id
-      })
+      }).select('listing_id')
 
       if(error){
         console.error("Error inserting data: ", error);
         alert("Failed to create listing");
       }
-        
-      alert("Listing created successfully");
-      // router.push('/')
+
+      const listingID = listingData[0]?.listing_id;
+
+      const photoInsert = files.map(async(file) => {
+        const {data: storageData, error: storageError} = await supabase.storage.from('listing-photos')
+          .upload(`${listingID}` + "/" + uuidv4(), file)
+
+        if(storageError){
+          console.error("Error uploading file: ", storageError);
+          return null
+        }
+
+        const {publicURL} = supabase.storage.from('listing-photos').getPublicUrl(storageData.path);
+
+        const {error: photoError} = supabase.from('listing-photos').insert({
+          listing_id: listingID,
+          image_url: publicURL,
+        });
+
+        if(photoError){
+          console.error('Error inserting photo: ', photoError);
+          return null;
+        }
+
+        return publicURL;
+      })
+
+      const uploadedPhotos = await Promise.all(photoInsert);
+
+      if(uploadedPhotos.includes(null)){
+        alert("Sme photos were not uploaded")
+      }else{
+        alert("Listing created successfully");
+      }
     }catch(err) {
       console.error("Error submitting form: ", err);
     }finally{
