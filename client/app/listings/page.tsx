@@ -1,28 +1,65 @@
 "use server"
+
 import { createClient } from '@/utils/supabase/server';
 import ListingCard from '@/components/ListingCard';
-import Link from 'next/link';
 import Header from '@/components/Header';
 
 const ListingsPage = async () => {
   const supabase = await createClient();
-  const {data} = await supabase.from("listings").select("*");
-  console.log(data)
+  const {data: listings, error} = await supabase.from("listings").select("*");
+
+  if(error){
+    console.error('Error fetching listings: ', error.message)
+    return <p>Error loading listings</p>
+  }
+
+  const getListingImages = async(listingID: string) => {
+    try{
+      const {data: files, error: listError} = await supabase.storage.from('listing-photos').list(`${listingID}`, { limit: 100 });
+
+      if(listError){
+        console.error(`Error listing files for ${listingID}: `, listError.message);
+        return `/placeholder.jpg`;
+      }
+
+      if(files && files.length > 0){
+        supabase.storage.from('listing-photos').getPublicUrl(`${listingID}/${files[0].name}`);
+
+        const publicURLs = await Promise.all(
+          files.map(async (file) => {
+            const { data: publicURLData } = await supabase.storage.from('listing-photos').getPublicUrl(`${listingID}/${file.name}`);
+            return publicURLData?.publicUrl || "/placeholder.jpg"; // Return the URL or a placeholder if not found
+          })
+        )
+
+        return publicURLs || "/placeholder.jpg";
+      }
+
+      return "/placeholder.jpg";
+    }catch(error){
+      console.error(`Error fetching image for ${listingID}: `, error)
+      return "/placeholder.jpg";
+    }
+  };
+
+  const listingWithImages = await Promise.all(
+    listings.map(async(listing: any) => {
+      const imageURL = await getListingImages(listing.listing_id);
+
+      return {...listing, imageURL};
+    })
+  );
   
   return (
     <div className="container mx-auto px-4">
       <Header/>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {data && data?.map((listing: any) => {
+        {listingWithImages.map((listing: any) => {
           return (
-            <Link 
-              href={`/listings/${listing.listing_id}`} 
-              key={listing.listing_id}
-              className="w-full cursor-pointer"
-            >
+            <div key={listing.listing_id} className="w-full cursor-pointer">
               <ListingCard
-                imageUrl={listing.listing_photo_id || "/placeholder.jpg"}
+                imageUrl={listing.imageURL || "/placeholder.jpg"}
                 status={listing.status}
                 address={listing.address}
                 rent={listing.rent}
@@ -31,9 +68,9 @@ const ListingsPage = async () => {
                 levels={listing.levels}
                 sqft={listing.sqft}
                 author={listing.author_id}
-                
+                listingID={listing.listing_id}
               />
-            </Link>
+            </div>
           )
         })}
       </div>
