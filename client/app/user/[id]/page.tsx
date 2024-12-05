@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import { createClient } from "@/utils/supabase/client";
@@ -21,7 +21,7 @@ interface UserProfile {
 
 interface Listing {
   listing_id: string;
-  images: string[];
+  images: string[];  // This will hold the image URLs for each listing
   status: string;
   address: string;
   rent: number;
@@ -29,7 +29,7 @@ interface Listing {
   baths: number;
   levels: number;
   sqft: number;
-  author: string;
+  author_id: string;
   created_at: string;
 }
 
@@ -49,21 +49,18 @@ const UserPage = () => {
     const fetchProfileAndListings = async () => {
       try {
         // Fetch profile data based on username from URL
-        const { data: profileData, error: profileError } = await supabase
-          .from('user')
-          .select('*')
-          .eq('username', userName)
-          .single();
+        const { data: profileData, error: profileError } = await supabase.from('user').select('*').eq('username', userName).single();
 
         if (profileError) throw profileError;
+
         setProfile(profileData);
 
         if (profileData.user_type === 'host') {
-          const { data: listingsData, error: listingsError } = await supabase
-            .from('listings')
+          const { data: listingsData, error: listingsError } = await supabase.from('listings')
             .select(`
               listing_id,
-              images,
+              title,
+              description,
               status,
               address,
               rent,
@@ -71,14 +68,36 @@ const UserPage = () => {
               baths,
               levels,
               sqft,
-              author,
+              author_id,
               created_at
             `)
-            .eq('host_id', profileData.user_id)
+            .eq('author_id', profileData.user_id)
             .order('created_at', { ascending: false });
 
-          if (listingsError) throw listingsError;
-          setListings(listingsData || []);
+          if (listingsError) {
+            console.log(listingsError);
+          }
+
+          // Fetch images for each listing
+          if (listingsData) {
+            const listingsWithImages = await Promise.all(listingsData.map(async (listing) => {
+              const { data: imagesData, error: imagesError } = await supabase.storage.from('listing-photos').list(`${listing.listing_id}/`, { limit: 10 });
+              
+              if (imagesError) {
+                console.error('Error fetching images:', imagesError);
+                return { ...listing, images: ["/placeholder.jpg"] }; // Placeholder if images not found
+              }
+
+              const imageUrls = imagesData?.map((file) => {
+                const { data: urlData } = supabase.storage.from('listing-photos').getPublicUrl(`${listing.listing_id}/${file.name}`);
+                return urlData?.publicUrl || "/placeholder.jpg";
+              });
+
+              return { ...listing, images: imageUrls || ["/placeholder.jpg"] };
+            }));
+
+            setListings(listingsWithImages);
+          }
         }
       } catch (err: any) {
         setError(err.message);
@@ -89,7 +108,7 @@ const UserPage = () => {
     };
 
     if (userName) {
-      fetchProfileAndListings();++
+      fetchProfileAndListings();
     }
   }, [userName, supabase]);
 
@@ -148,15 +167,18 @@ const UserPage = () => {
               </div>
             </div>
           </CardHeader>
+
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm text-gray-500">Full Name</label>
               <p className="text-lg">{profile.full_name || 'Not set'}</p>
             </div>
+
             <div>
               <label className="text-sm text-gray-500">Username</label>
               <p className="text-lg">{profile.username || 'Not set'}</p>
             </div>
+
             {isOwner && (
               <>
                 <div>
@@ -169,6 +191,7 @@ const UserPage = () => {
                 </div>
               </>
             )}
+
             <div>
               <label className="text-sm text-gray-500">Account Type</label>
               <p className="text-lg capitalize">{profile.user_type}</p>
@@ -181,6 +204,7 @@ const UserPage = () => {
             <h2 className="text-xl font-semibold">
               {isOwner ? 'Your Listings' : `${profile.full_name || profile.username}'s Listings`}
             </h2>
+
             {listings.length === 0 ? (
               <Card>
                 <CardContent className="p-6 text-center text-gray-500">
@@ -202,7 +226,8 @@ const UserPage = () => {
                       baths={listing.baths}
                       levels={listing.levels}
                       sqft={listing.sqft}
-                      author={listing.author}
+                      author={listing.author_id}
+                      listingID={listing.listing_id}
                     />
                   </Link>
                 ))}
