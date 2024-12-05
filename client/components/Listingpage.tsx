@@ -182,7 +182,9 @@ const ListingPage: React.FC<PropertyCardProps> = ({
 
             {user?.id === author ? (
               <div className="">
-                
+                <Button>
+                  Edit
+                </Button>
               </div>
             ) :(
                 <Button 

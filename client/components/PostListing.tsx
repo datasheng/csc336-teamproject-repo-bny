@@ -92,7 +92,7 @@ const PostListing = () => {
 
         const {publicURL} = supabase.storage.from('listing-photos').getPublicUrl(storageData.path);
 
-        const {error: photoError} = supabase.from('listing-photos').insert({
+        const {error: photoError} = supabase.from('listing_photos').insert({
           listing_id: listingID,
           image_url: publicURL,
         });
@@ -111,6 +111,7 @@ const PostListing = () => {
         alert("Sme photos were not uploaded")
       }else{
         alert("Listing created successfully");
+        router.push('/listings')
       }
     }catch(err) {
       console.error("Error submitting form: ", err);
