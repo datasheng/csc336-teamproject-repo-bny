@@ -6,7 +6,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Load the model
-with open('model.pkl', 'rb') as file:
+with open('rent-prediction.pkl', 'rb') as file:
     model = pickle.load(file)
 
 @app.route('/predict', methods=['POST'])
