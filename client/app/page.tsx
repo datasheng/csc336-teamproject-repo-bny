@@ -64,7 +64,9 @@ export default function Home() {
             Your space to find cheaper rent
           </motion.h2>
           
-          <SearchBar/>
+            <div className="mt-8 w-full max-w-4xl flex justify-center">
+              <SearchBar/>
+            </div>
         </div>
 
         <div className="hidden xl:flex justify-center space-x-6">

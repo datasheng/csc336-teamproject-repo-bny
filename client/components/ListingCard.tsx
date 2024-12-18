@@ -50,7 +50,7 @@ const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, re
         {imageUrl.length > 0 && (
           <>
             <button className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-lg hover:bg-gray-800 focus:outline-none" onClick={handlePrev}>&larr;</button>
-            <button className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-lg hover:bg-gray-800 focus:outline-none" onClick={handlePrev}>&rarr;</button>
+            <button className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full shadow-lg hover:bg-gray-800 focus:outline-none" onClick={handleNext}>&rarr;</button>
 
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-gray-900 bg-opacity-75 px-3 py-1 rounded">
               {currentIdx + 1} / {imageUrl.length}
