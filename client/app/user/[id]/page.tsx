@@ -9,6 +9,10 @@ import Image from "next/legacy/image";
 import Link from 'next/link';
 import Header from '@/components/Header';
 import ListingCard from '@/components/ListingCard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Badge } from "@/components/ui/badge"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
 
 interface UserProfile {
   email: string;
@@ -44,6 +48,37 @@ const UserPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const supabase = createClient();
+
+  // Add new state for edit mode
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    full_name: '',
+    username: '',
+    email: '',
+    phone_number: ''
+  });
+
+  // Add handler for edit form
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase
+        .from('user')
+        .update({
+          full_name: editFormData.full_name,
+          username: editFormData.username,
+          email: editFormData.email,
+          phone_number: editFormData.phone_number
+        })
+        .eq('user_id', currentUser?.id);
+
+      if (error) throw error;
+      setProfile({ ...profile, ...editFormData, avatar_url: profile?.avatar_url || null, user_type: profile?.user_type || 'roommate' });
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchProfileAndListings = async () => {
@@ -146,95 +181,230 @@ const UserPage = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4 py-8 space-y-6">
-        <Card>
-          <CardHeader>
-            <div className="flex items-center space-x-4">
-              <div className="relative w-16 h-16">
-                <Image
-                  src={profile.avatar_url || '/default-avatar.png'}
-                  alt="Profile"
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-full"
-                />
+      <div className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="relative mb-8">
+          <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg" />
+          <div className="absolute -bottom-16 left-8 flex items-end space-x-6">
+            <div className="relative w-32 h-32 ring-4 ring-white dark:ring-gray-900 rounded-full overflow-hidden">
+              <Image
+                src={profile?.avatar_url || '/default-avatar.png'}
+                alt="Profile"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-full"
+              />
+            </div>
+            <div className="pb-4">
+              <h1 className="text-3xl font-bold text-black dark:text-white">
+                {profile?.full_name || profile?.username}
+              </h1>
+              <Badge variant="secondary" className="mt-2">
+                {profile?.user_type === 'host' ? 'Property Host' : 'Looking for Room'}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="mt-20">
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="listings">Listings</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="profile" className="space-y-6">
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <h3 className="text-2xl font-bold text-blue-600">
+                      {listings.length || "0"}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {listings.length === 0 ? "No listings" : "Total Listings"}
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <h3 className="text-2xl font-bold text-green-600">
+                      {format(new Date(profile?.created_at || ''), 'MMM yyyy')}
+                    </h3>
+                    <p className="text-sm text-gray-500">Member Since</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-6 text-center">
+                    <h3 className="text-2xl font-bold text-purple-600">
+                      {/* Add rating or other metric */}
+                      4.8
+                    </h3>
+                    <p className="text-sm text-gray-500">Rating</p>
+                  </CardContent>
+                </Card>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">
-                  {isOwner ? 'Your Profile' : `${profile.full_name || profile.username}'s Profile`}
-                </h1>
-                {isOwner && <p className="text-gray-500">Welcome back!</p>}
-              </div>
-            </div>
-          </CardHeader>
 
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm text-gray-500">Full Name</label>
-              <p className="text-lg">{profile.full_name || 'Not set'}</p>
-            </div>
-
-            <div>
-              <label className="text-sm text-gray-500">Username</label>
-              <p className="text-lg">{profile.username || 'Not set'}</p>
-            </div>
-
-            {isOwner && (
-              <>
-                <div>
-                  <label className="text-sm text-gray-500">Email</label>
-                  <p className="text-lg">{profile.email}</p>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-500">Phone Number</label>
-                  <p className="text-lg">{profile.phone_number || 'Not set'}</p>
-                </div>
-              </>
-            )}
-
-            <div>
-              <label className="text-sm text-gray-500">Account Type</label>
-              <p className="text-lg capitalize">{profile.user_type}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {profile.user_type === 'host' && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">
-              {isOwner ? 'Your Listings' : `${profile.full_name || profile.username}'s Listings`}
-            </h2>
-
-            {listings.length === 0 ? (
+              {/* Profile Info */}
               <Card>
-                <CardContent className="p-6 text-center text-gray-500">
-                  {isOwner ? 
-                    "You haven't posted any listings yet." :
-                    "This user hasn't posted any listings yet."}
+                <CardHeader className="flex justify-between flex-row items-center px-6">
+                  <h3 className="text-xl font-semibold">Profile Information</h3>
+                  {isOwner && !isEditing && (
+                    <button
+                      onClick={() => {
+                        setIsEditing(true);
+                        setEditFormData({
+                          full_name: profile?.full_name || '',
+                          username: profile?.username || '',
+                          email: profile?.email || '',
+                          phone_number: profile?.phone_number || ''
+                        });
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                      Edit Profile
+                    </button>
+                  )}
+                </CardHeader>
+                <CardContent className="p-6 space-y-4">
+                  {isEditing ? (
+                    <form onSubmit={handleEditSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Full Name</label>
+                          <input
+                            type="text"
+                            value={editFormData.full_name}
+                            onChange={e => setEditFormData(prev => ({ ...prev, full_name: e.target.value }))}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Username</label>
+                          <input
+                            type="text"
+                            value={editFormData.username}
+                            onChange={e => setEditFormData(prev => ({ ...prev, username: e.target.value }))}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Email</label>
+                          <input
+                            type="email"
+                            value={editFormData.email}
+                            onChange={e => setEditFormData(prev => ({ ...prev, email: e.target.value }))}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-gray-500">Phone</label>
+                          <input
+                            type="tel"
+                            value={editFormData.phone_number}
+                            onChange={e => setEditFormData(prev => ({ ...prev, phone_number: e.target.value }))}
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-3">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditing(false)}
+                          className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                          Save Changes
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Full Name</label>
+                        <p className="text-lg">{profile?.full_name || 'Not set'}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Username</label>
+                        <p className="text-lg">{profile?.username}</p>
+                      </div>
+                      {isOwner && (
+                        <>
+                          <div>
+                            <label className="text-sm font-medium text-gray-500">Email</label>
+                            <p className="text-lg">{profile?.email}</p>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-gray-500">Phone</label>
+                            <p className="text-lg">{profile?.phone_number || 'Not set'}</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {listings.map(listing => (
-                  <Link href={`/listings/${listing.listing_id}`} key={listing.listing_id}>
-                    <ListingCard
-                      imageUrl={listing.images}
-                      status={listing.status}
-                      address={listing.address}
-                      rent={listing.rent}
-                      beds={listing.beds}
-                      baths={listing.baths}
-                      levels={listing.levels}
-                      sqft={listing.sqft}
-                      author={listing.author_id}
-                      listingID={listing.listing_id}
-                    />
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+            </TabsContent>
+
+            <TabsContent value="listings">
+              {profile?.user_type === 'host' && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">
+                      {isOwner ? 'Your Listings' : `${profile.full_name || profile.username}'s Listings`}
+                    </h2>
+                    {isOwner && (
+                      <Link href="/listings/new" className="btn">
+                        Add New Listing
+                      </Link>
+                    )}
+                  </div>
+
+                  {listings.length === 0 ? (
+                    <Card>
+                      <CardContent className="p-12 text-center">
+                        <div className="space-y-4">
+                          <div className="text-6xl">🏠</div>
+                          <h3 className="text-xl font-semibold">No Listings Yet</h3>
+                          <p className="text-gray-500">
+                            {isOwner ? "Ready to post your first listing?" : "This user hasn't posted any listings yet."}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {listings.map(listing => (
+                        <Link href={`/listings/${listing.listing_id}`} key={listing.listing_id}>
+                          <ListingCard
+                            imageUrl={listing.images}
+                            status={listing.status}
+                            address={listing.address}
+                            rent={listing.rent}
+                            beds={listing.beds}
+                            baths={listing.baths}
+                            levels={listing.levels}
+                            sqft={listing.sqft}
+                            author={listing.author_id}
+                            listingID={listing.listing_id}
+                          />
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+
+            
+          </Tabs>
+        </div>
       </div>
     </>
   );
