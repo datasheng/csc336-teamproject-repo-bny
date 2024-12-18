@@ -7,6 +7,7 @@ import { Send, UserPlus } from "lucide-react";
 import Image from "next/legacy/image";
 import { toast } from "sonner";
 import Header from '@/components/Header';
+import { Badge } from '@/components/ui/badge';
 
 interface Message {
   message_id: string;
@@ -31,6 +32,8 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
     const [newMessage, setNewMessage] = useState("");
     const [listingId, setListingId] = useState<string | null>(null);
     const [isMatchPending, setIsMatchPending] = useState(false);
+    const [isHost, setIsHost] = useState(false);
+    const [matchStatus, setMatchStatus] = useState<string | null>(null);
     const supabase = createClient();
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -56,6 +59,21 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
         const recipientId = chatData.host_id === user.id ? chatData.roommate_id : chatData.host_id;
         setRecipientId(recipientId);
         setListingId(chatData.listing_id);
+
+        // Check if current user is host
+        setIsHost(chatData.host_id === user.id);
+
+        // If host, check for pending matches
+        if (chatData.host_id === user.id && chatData.listing_id) {
+          const { data: matchData } = await supabase
+            .from('matches')
+            .select('match_status')
+            .eq('listing_id', chatData.listing_id)
+            .eq('user_id', recipientId)
+            .single();
+
+          setMatchStatus(matchData?.match_status || null);
+        }
 
         // Check if match is already pending
         if (chatData.listing_id) {
@@ -185,6 +203,24 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
     }
   };
 
+  const handleMatchAction = async (action: 'accepted' | 'rejected') => {
+    try {
+      const { error } = await supabase
+        .from('matches')
+        .update({ match_status: action })
+        .eq('listing_id', listingId)
+        .eq('user_id', recipientId);
+
+      if (error) throw error;
+
+      setMatchStatus(action);
+      toast.success(`Match ${action} successfully!`);
+    } catch (error) {
+      console.error('Error updating match:', error);
+      toast.error('Failed to update match status');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 p-4">
       <Header/>
@@ -213,6 +249,32 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
                 <p className="text-sm text-gray-400">Active now</p>
               </div>
             </div>
+            {isHost && matchStatus === 'pending' ? (
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => handleMatchAction('accepted')}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Accept Match
+                </Button>
+                <Button
+                  onClick={() => handleMatchAction('rejected')}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Reject Match
+                </Button>
+              </div>
+            ) : (
+              matchStatus && (
+                <Badge className={`${
+                  matchStatus === 'accepted' ? 'bg-green-100 text-green-800' : 
+                  matchStatus === 'rejected' ? 'bg-red-100 text-red-800' :
+                  'bg-yellow-100 text-yellow-800'
+                }`}>
+                  Match {matchStatus}
+                </Badge>
+              )
+            )}
             {listingId && (
               <Button
                 onClick={handleMatch}
