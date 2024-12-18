@@ -6,13 +6,15 @@ import { createClient } from '@/utils/supabase/client';
 const ContactPage = () => {
   const supabase = createClient()
   const [loading, setLoading] = useState(true)
-  const [userData, setUserData] = useState({
+  const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    email: ''
+    email: '',
+    subject: '',
+    message: ''
   })
-  const [message, setMessage] = useState('')
-  const [updating, setUpdating] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     const getProfile = async () => {
@@ -21,21 +23,19 @@ const ContactPage = () => {
         if (user) {
           const { data, error } = await supabase
             .from('user')
-            .select('first_name, last_name, email, phone_number')
+            .select('first_name, last_name, email')
             .eq('user_id', user.id)
             .single()
 
-          if (error) {
-            console.error('Error fetching user data:', error)
-            return
-          }
+          if (error) throw error
 
           if (data) {
-            setUserData({
+            setFormData(prev => ({
+              ...prev,
               first_name: data.first_name || '',
               last_name: data.last_name || '',
               email: data.email || ''
-            })
+            }))
           }
         }
       } catch (error) {
@@ -48,8 +48,10 @@ const ContactPage = () => {
     getProfile()
   }, [supabase])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }))
@@ -57,27 +59,34 @@ const ContactPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setUpdating(true)
+    setSubmitting(true)
+    
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('No user')
-
+      
       const { error } = await supabase
-        .from('user')
-        .update({
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          email: userData.email
+        .from('contact_form_submissions')
+        .insert({
+          user_id: user?.id || null,
+          subject: formData.subject,
+          message: formData.message,
+          status: 'pending'
         })
-        .eq('user_id', user.id)
 
       if (error) throw error
-      setMessage('Profile updated successfully!')
+
+      setStatusMessage('Message sent successfully!')
+      // Reset form fields except user data
+      setFormData(prev => ({
+        ...prev,
+        subject: '',
+        message: ''
+      }))
     } catch (error) {
-      console.error(error)
-      setMessage('Error updating profile')
+      console.error('Error:', error)
+      setStatusMessage('Error sending message')
     } finally {
-      setUpdating(false)
+      setSubmitting(false)
     }
   }
 
@@ -103,29 +112,31 @@ const ContactPage = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 First Name
               </label>
               <input
                 type="text"
-                name="firstName"
-                id="firstName"
-                value={userData.first_name}
+                name="first_name"
+                id="first_name"
+                value={formData.first_name}
                 onChange={handleChange}
+                disabled
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               />
             </div>
 
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+              <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
                 Last Name
               </label>
               <input
                 type="text"
-                name="lastName"
-                id="lastName"
-                value={userData.last_name}
+                name="last_name"
+                id="last_name"
+                value={formData.last_name}
                 onChange={handleChange}
+                disabled
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               />
             </div>
@@ -139,8 +150,9 @@ const ContactPage = () => {
               type="email"
               name="email"
               id="email"
-              value={userData.email}
+              value={formData.email}
               onChange={handleChange}
+              disabled
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             />
           </div>
@@ -153,8 +165,10 @@ const ContactPage = () => {
               type="text"
               name="subject"
               id="subject"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              value={formData.subject}
+              onChange={handleChange}
               required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             />
           </div>
 
@@ -166,24 +180,26 @@ const ContactPage = () => {
               name="message"
               id="message"
               rows={6}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              value={formData.message}
+              onChange={handleChange}
               required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             />
           </div>
 
-          {message && (
-            <div className={`mt-4 text-center ${message.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
-              {message}
+          {statusMessage && (
+            <div className={`mt-4 text-center ${statusMessage.includes('Error') ? 'text-red-600' : 'text-green-600'}`}>
+              {statusMessage}
             </div>
           )}
 
           <div className="flex justify-center">
             <button
               type="submit"
-              disabled={updating}
+              disabled={submitting}
               className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md shadow-sm disabled:opacity-50"
             >
-              {updating ? 'Updating...' : 'Update Profile'}
+              {submitting ? 'Sending...' : 'Send Message'}
             </button>
           </div>
         </form>
