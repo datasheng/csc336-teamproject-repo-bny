@@ -110,7 +110,7 @@ const PostListing = () => {
       const uploadedPhotos = await Promise.all(photoInsert);
 
       if(uploadedPhotos.includes(null)){
-        alert("Sme photos were not uploaded")
+        alert("Some photos were not uploaded")
       }else{
         alert("Listing created successfully");
         router.push('/listings')
@@ -131,6 +131,7 @@ const PostListing = () => {
       const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
       const data = await response.json();
       if (data && data.length > 0) {
+        console.log(data[0].lat);
       return {
         lat: data[0].lat,
         lon: data[0].lon,
@@ -145,8 +146,14 @@ const PostListing = () => {
 
     const { lat, lon } = await geocodeAddress(formData.address)
 
+    if (!formData.sqft || !lat || !lon || !formData.beds || !formData.baths) {
+      alert('Please fill out all required fields');
+      setIsPredicting(false);
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/predict', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -158,7 +165,7 @@ const PostListing = () => {
         })
       });
       const data = await response.json();
-      setPredictedRent(data.prediction);
+      setPredictedRent(data.prediction/formData.max_roommates);
     } catch (error) {
       console.error('Prediction failed:', error);
       alert('Failed to get rent prediction');
@@ -201,7 +208,7 @@ const PostListing = () => {
                 {predictedRent !== null && (
                   <div className="mt-2 p-3 bg-green-50 dark:bg-green-900 rounded-md">
                     <p className="text-sm font-medium text-green-800 dark:text-green-100">
-                      Predicted Rent: ${predictedRent.toLocaleString()}
+                      Predicted Rent Per Roommate: ${predictedRent.toLocaleString()}
                     </p>
                     <p className="text-xs text-green-600 dark:text-green-200 mt-1">
                       This is an AI prediction based on your listing details
