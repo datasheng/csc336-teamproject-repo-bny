@@ -85,7 +85,7 @@ const Navbar = () => {
       <nav className="bg-transparent backdrop-blur-md px-6 py-3 rounded-full border border-white/20 shadow-md ml-12">
         <ul className="flex space-x-8 text-white font-medium">
           <li className="p-2 rounded-lg text-black dark:text-white hover:bg-white dark:hover:text-black transition-colors">
-            <Link href="/home">
+            <Link href="/">
               Home
             </Link>
           </li>
@@ -148,10 +148,12 @@ const Navbar = () => {
                     <Link href={`/user/${userName}`}>Profile</Link>
                   </DropdownMenuItem>
 
+                  {/*
                   <DropdownMenuItem>
                     <Settings/>
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
+                  */}
 
                   <DropdownMenuItem>
                     <LogOutIcon/>

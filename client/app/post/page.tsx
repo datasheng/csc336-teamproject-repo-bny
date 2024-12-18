@@ -1,5 +1,6 @@
 "use client"
 
+import Header from '@/components/Header';
 import PostListing from '@/components/PostListing';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -23,7 +24,10 @@ const ListPage = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
+      <div className='flex flex-col'>
+      <Header/>
       <PostListing/>
+      </div>
     </div>
   )
 }
