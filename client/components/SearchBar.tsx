@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { IoSearchOutline } from "react-icons/io5";
 
 const SearchBar = () => {
   const router = useRouter();
@@ -13,17 +14,21 @@ const SearchBar = () => {
   };
 
   return (
-    <form onSubmit={handleSearch} className="flex items-center w-full max-w-2xl p-2 rounded-lg shadow-lg">
+    <form
+      onSubmit={handleSearch}
+      className="flex items-center w-full max-w-md rounded-full border-2 px-4 py-2 shadow-md"
+    >
+      <IoSearchOutline className="mr-2" size={20} />
       <input
-        type="text"
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        placeholder="Search listings..."
-        className="flex-grow p-2 border-none focus:outline-none"
+      type="text"
+      value={keyword}
+      onChange={(e) => setKeyword(e.target.value)}
+      placeholder="Search listings..."
+      className="flex-grow border-none bg-transparent focus:outline-none"
       />
       <button
         type="submit"
-        className="px-4 py-2 font-semibold rounded-lg transition"
+        className="hidden"
       >
         Search
       </button>

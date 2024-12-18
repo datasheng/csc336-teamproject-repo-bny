@@ -102,9 +102,7 @@ const Navbar = () => {
                   Post
                 </Link>
             </li>
-          ) : (
-            <div></div>
-          )}
+          ) : null}
 
           <li className="p-2 rounded-lg text-black dark:text-white hover:bg-white dark:hover:text-black transition-colors">
             <Link href="/about">

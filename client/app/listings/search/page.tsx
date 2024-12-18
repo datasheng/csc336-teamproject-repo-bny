@@ -19,36 +19,77 @@ const SearchPage = () => {
   const fetchListings = async () => {
     setLoading(true);
     const keyword = searchParams.get("keyword") || "";
-    const beds = searchParams.get("beds") || "";
+    const beds = searchParams.get("beds") || ""; // e.g., "3-10"
     const baths = searchParams.get("baths") || "";
-    const rent = searchParams.get("rent") || "";
+    const rent = searchParams.get("rent") || ""; // e.g., "500-5000"
     const levels = searchParams.get("levels") || "";
     const sqft = searchParams.get("sqft") || "";
-
+  
     let query = supabase.from("listings").select("*");
-
+  
     if (keyword) {
-      query = query.ilike("title", `%${keyword}%`)
-        .or(`description.ilike.%${keyword}%`)
-        .or(`address.ilike.%${keyword}%`);
+      query = query.or(`title.ilike.%${keyword}%,description.ilike.%${keyword}%,address.ilike.%${keyword}%`);
     }
-
-    if (beds) query = query.eq("beds", beds);
-    if (baths) query = query.eq("baths", baths);
-    if (rent) query = query.lte("rent", rent);
-    if (levels) query = query.eq("levels", levels);
-    if (sqft) query = query.gte("sqft", sqft);
-
+  
+    // Handle ranges (e.g., "3-10" -> min=3, max=10)
+    const applyRangeFilter = (param, columnName) => {
+      if (param) {
+        const [min, max] = param.split("-").map(Number);
+        if (min) query = query.gte(columnName, min);
+        if (max) query = query.lte(columnName, max);
+      }
+    };
+  
+    applyRangeFilter(beds, "beds");
+    applyRangeFilter(baths, "baths");
+    applyRangeFilter(rent, "rent");
+    applyRangeFilter(levels, "levels");
+    applyRangeFilter(sqft, "sqft");
+  
     const { data, error } = await query;
-
+  
     if (error) {
       console.error("Error fetching listings:", error);
-    } else {
-      setListings(data);
+      setLoading(false);
+      return;
     }
-
+  
+    const getListingImages = async (listingID) => {
+      const { data, error } = await supabase.storage
+        .from('listing-photos')
+        .list(`${listingID}/`, { limit: 100 });
+  
+      if (error) {
+        console.error(`Error listing files for ${listingID}: `, error.message);
+        return ["/placeholder.jpg"];
+      }
+  
+      if (data && data.length > 0) {
+        const publicURLs = await Promise.all(
+          data.map(async (file) => {
+            const { data: publicURLData } = supabase.storage
+              .from('listing-photos')
+              .getPublicUrl(`${listingID}/${file.name}`);
+            return publicURLData?.publicUrl || "/placeholder.jpg";
+          })
+        );
+  
+        return publicURLs;
+      }
+  
+      return ["/placeholder.jpg"];
+    };
+  
+    const listingsWithImages = await Promise.all(
+      data.map(async (listing) => {
+        const imageURLs = await getListingImages(listing.listing_id);
+        return { ...listing, imageURLs };
+      })
+    );
+  
+    setListings(listingsWithImages);
     setLoading(false);
-  };
+  };  
 
   useEffect(() => {
     fetchListings();
@@ -58,20 +99,14 @@ const SearchPage = () => {
     <div className="min-h-screen">
       <Header />
       <div className="container mx-auto px-4 py-4">
-        {/* Search Bar */}
         <div className="flex justify-center mb-4">
           <SearchBar />
         </div>
-
-        {/* Layout */}
         <div className="flex">
-          {/* Filters Sidebar */}
           <aside className="w-1/4 shadow-lg p-4 rounded-lg">
             <h2 className="font-semibold text-lg mb-4">Filters</h2>
             <Filter />
           </aside>
-
-          {/* Listings Section */}
           <main className="flex-1 ml-4">
             {loading ? (
               <p className="text-center">Loading...</p>
@@ -84,7 +119,7 @@ const SearchPage = () => {
                   {listings.map((listing) => (
                     <ListingCard
                       key={listing.listing_id}
-                      imageUrl={listing.imageURL || "/placeholder.jpg"}
+                      imageUrl={listing.imageURLs}
                       status={listing.status}
                       address={listing.address}
                       rent={listing.rent}

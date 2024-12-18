@@ -1,82 +1,57 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 
 const Filter = () => {
   const router = useRouter();
-  const [beds, setBeds] = useState("");
-  const [baths, setBaths] = useState("");
-  const [rent, setRent] = useState("");
-  const [levels, setLevels] = useState("");
-  const [sqft, setSqft] = useState("");
+  const [beds, setBeds] = useState([1, 10]);
+  const [baths, setBaths] = useState([1, 10]);
+  const [rent, setRent] = useState([500, 5000]);
+  const [levels, setLevels] = useState([1, 5]);
+  const [sqft, setSqft] = useState([500, 10000]);
 
   const handleFilter = () => {
-    const params = new URLSearchParams(window.location.search);
-    if (beds) params.set("beds", beds);
-    else params.delete("beds");
-    if (baths) params.set("baths", baths);
-    else params.delete("baths");
-    if (rent) params.set("rent", rent);
-    else params.delete("rent");
-    if (levels) params.set("levels", levels);
-    else params.delete("levels");
-    if (sqft) params.set("sqft", sqft);
-    else params.delete("sqft");
+    const params = new URLSearchParams();
+    if (beds[0] !== 1 || beds[1] !== 10) params.set("beds", beds.join("-"));
+    if (baths[0] !== 1 || baths[1] !== 10) params.set("baths", baths.join("-"));
+    if (rent[0] !== 500 || rent[1] !== 5000) params.set("rent", rent.join("-"));
+    if (levels[0] !== 1 || levels[1] !== 5) params.set("levels", levels.join("-"));
+    if (sqft[0] !== 500 || sqft[1] !== 10000) params.set("sqft", sqft.join("-"));
     router.push(`/listings/search?${params.toString()}`);
   };
 
+  const renderSlider = (label, state, setState, minLimit, maxLimit, step, unit = "") => (
+    <div className="mb-4">
+      <label className="block text-sm font-medium mb-2">{label}</label>
+      <div className="flex justify-between mb-2">
+        <span>{unit}{state[0]}</span>
+        <span>{unit}{state[1]}</span>
+      </div>
+      <Slider
+        min={minLimit}
+        max={maxLimit}
+        step={step}
+        defaultValue={state}
+        onValueChange={(value) => setState(value)}
+        className="w-full"
+      />
+    </div>
+  );
+
   return (
     <div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Beds</label>
-        <input
-          type="number"
-          value={beds}
-          onChange={(e) => setBeds(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Baths</label>
-        <input
-          type="number"
-          value={baths}
-          onChange={(e) => setBaths(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Rent</label>
-        <input
-          type="number"
-          value={rent}
-          onChange={(e) => setRent(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Levels</label>
-        <input
-          type="number"
-          value={levels}
-          onChange={(e) => setLevels(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium">Square Feet</label>
-        <input
-          type="number"
-          value={sqft}
-          onChange={(e) => setSqft(e.target.value)}
-          className="w-full p-2 border rounded-lg"
-        />
-      </div>
-      <button
+      {renderSlider("Beds", beds, setBeds, 1, 10, 1)}
+      {renderSlider("Baths", baths, setBaths, 1, 10, 1)}
+      {renderSlider("Rent", rent, setRent, 500, 5000, 100, "$")}
+      {renderSlider("Levels", levels, setLevels, 1, 5, 1)}
+      {renderSlider("Square Feet", sqft, setSqft, 500, 10000, 100)}
+      <Button
         onClick={handleFilter}
-        className="w-full p-2 rounded-lg transition"
+        className="w-full p-2 rounded-lg transition bg-slate-950 text-white hover:bg-slate-800 border border-white"
       >
         Apply Filters
-      </button>
+      </Button>
     </div>
   );
 };
