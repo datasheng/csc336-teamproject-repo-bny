@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/legacy/image";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import Header from '@/components/Header';
 
 interface Chat {
   chat_id: string;
@@ -131,6 +132,7 @@ function ChatsPage() {
   if (chats.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
+        <Header/>
         <Card className="p-6 text-center text-gray-500">
           No active chats. Start browsing listings to connect with hosts!
         </Card>
@@ -140,6 +142,7 @@ function ChatsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Header/>
       <h1 className="text-2xl font-bold mb-6">Your Chats</h1>
       <div className="space-y-4">
         {chats.map(chat => (
