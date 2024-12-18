@@ -5,8 +5,11 @@ import numpy as np
 import os
 import joblib
 import pandas as pd
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app)
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -16,26 +19,38 @@ model = joblib.load(model_path)
 
 @app.route('/predict', methods=['POST'])
 def predict():    
-    #load data from the body
-    data = request.get_json()
-    #convert data to dataframe
+    try:
+        # Load and validate data
+        data = request.get_json()
+        if not all(k in data for k in ['sqfeet', 'lat', 'long', 'beds', 'baths']):
+            return jsonify({'error': 'Missing required fields'}), 400
 
-    new_data = {
-    'type_number': 1,
-    'sqfeet': data['sqfeet'],
-    'lat': data['lat'],    
-    'long': data['long'],
-    'beds': data['beds'],
-    'baths': data['baths'],
-    'state_number': 1,
-    }
-    print(data)
+        # Convert string values to numeric
+        new_data = {
+            'type_number': 1,
+            'sqfeet': float(data['sqfeet']),
+            'lat': float(data['lat']),    
+            'long': float(data['long']),
+            'beds': float(data['beds']),
+            'baths': float(data['baths']),
+            'state_number': 1,
+        }
+        
+        # Make prediction
+        df = pd.DataFrame([new_data])
+        prediction = model.predict(df)
+        
+        # Format response
+        return jsonify({
+            'status': 'success',
+            'prediction': round(float(prediction[0]), 2)
+        })
 
-    df = pd.DataFrame([new_data])
-
-    prediction = model.predict(df)
-
-    return jsonify({float(prediction[0])})
+    except ValueError as e:
+        return jsonify({'error': 'Invalid numeric values'}), 400
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': 'Prediction failed'}), 500
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
