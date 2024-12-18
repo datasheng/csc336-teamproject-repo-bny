@@ -148,10 +148,12 @@ const Navbar = () => {
                     <Link href={`/user/${userName}`}>Profile</Link>
                   </DropdownMenuItem>
 
+                  {/*
                   <DropdownMenuItem>
                     <Settings/>
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
+                  */}
 
                   <DropdownMenuItem>
                     <LogOutIcon/>
