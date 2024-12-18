@@ -56,7 +56,7 @@ const About = () => {
             <Shield className="mx-auto mb-4 text-black" size={100} />
             <h3 className="text-xl font-semibold text-gray-800">Secure and Transparent</h3>
             <p className="text-gray-600 mt-4 mx-auto max-w-lg">
-              Our platform offers secure and transparent processes to make sure both parties feel safe and informed every step of the way.
+              Our platform is designed to ensure both parties feel confident and informed throughout every step.
             </p>
           </div>
         </div>
