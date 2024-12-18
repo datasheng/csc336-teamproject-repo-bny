@@ -58,6 +58,9 @@ const UserPage = () => {
     phone_number: ''
   });
 
+  // Add new state for image upload
+  const [uploading, setUploading] = useState(false);
+
   // Add handler for edit form
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +80,50 @@ const UserPage = () => {
       setIsEditing(false);
     } catch (error) {
       console.error('Error updating profile:', error);
+    }
+  };
+
+  // Add upload handler function after existing state declarations
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploading(true);
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Create unique file path
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${currentUser?.id}-${Math.random()}.${fileExt}`;
+
+      // Upload to Supabase
+      const { error: uploadError } = await supabase.storage
+        .from('pfp')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('pfp')
+        .getPublicUrl(fileName);
+
+      // Update user profile
+      const { error: updateError } = await supabase
+        .from('user')
+        .update({ avatar_url: urlData?.publicUrl })
+        .eq('user_id', currentUser?.id);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      setProfile(prev => prev ? {
+        ...prev,
+        avatar_url: urlData?.publicUrl || null
+      } : null);
+
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -186,14 +233,35 @@ const UserPage = () => {
         <div className="relative mb-8">
           <div className="h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg" />
           <div className="absolute -bottom-16 left-8 flex items-end space-x-6">
-            <div className="relative w-32 h-32 ring-4 ring-white dark:ring-gray-900 rounded-full overflow-hidden">
+            <div className="relative w-32 h-32">
               <Image
                 src={profile?.avatar_url || '/default-avatar.png'}
                 alt="Profile"
                 layout="fill"
                 objectFit="cover"
-                className="rounded-full"
+                className="rounded-full ring-4 ring-white dark:ring-gray-900"
               />
+              {isOwner && (
+                <label 
+                  className="absolute bottom-0 right-0 p-2 bg-blue-600 rounded-full cursor-pointer hover:bg-blue-700 transition-colors"
+                  htmlFor="avatar-upload"
+                >
+                  {uploading ? (
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"/>
+                  ) : (
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                    </svg>
+                  )}
+                  <input
+                    id="avatar-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
             </div>
             <div className="pb-4">
               <h1 className="text-3xl font-bold text-black dark:text-white">
