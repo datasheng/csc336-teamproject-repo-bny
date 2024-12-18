@@ -98,8 +98,8 @@ const ContactPage = () => {
       {/* Header Section */}
       <div className="py-16 px-4 sm:px-6 lg:px-8 text-center text-white">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-extrabold mb-4 text-black">Contact Us</h1>
-          <p className="text-lg text-black">
+          <h1 className="text-4xl font-extrabold mb-4 dark:text-white text-black">Contact Us</h1>
+          <p className="text-lg dark:text-white text-black">
       Have questions? We'd love to hear from you. <br />
       Send us a message and we'll respond as soon as possible.
     </p>
@@ -119,7 +119,6 @@ const ContactPage = () => {
                 id="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
-                disabled
                 className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               />
             </div>
@@ -132,7 +131,6 @@ const ContactPage = () => {
                 id="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
-                disabled
                 className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
               />
             </div>
@@ -147,7 +145,6 @@ const ContactPage = () => {
               id="email"
               value={formData.email}
               onChange={handleChange}
-              disabled
               className="mt-1 block w-full rounded-lg border border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
             />
           </div>
