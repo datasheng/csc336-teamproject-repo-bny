@@ -182,9 +182,33 @@ const ListingPage: React.FC<PropertyCardProps> = ({
               >
                 &rarr;
               </button>
-              <div className='absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-gray-900 bg-opacity-75 px-4 py-2 rounded'>
-                {currentIdx + 1} / {imageUrl.length}
-              </div>
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {(() => {
+                    const dots = [];
+                    const maxDots = 5; // Show 5 dots at a time
+
+                    let startIdx = Math.max(
+                      0,
+                      Math.min(currentIdx - Math.floor(maxDots / 2), imageUrl.length - maxDots)
+                    );
+
+                    for (let i = startIdx; i < startIdx + Math.min(maxDots, imageUrl.length); i++) {
+                      dots.push(
+                        <span
+                          key={i}
+                          className={`h-1.5 rounded-full transition-all ${
+                            i === currentIdx
+                              ? 'w-3 bg-white opacity-100' // Active dot
+                              : i === 0
+                              ? 'w-1.5 bg-black opacity-80' // First dot (darker)
+                              : 'w-1.5 bg-gray-400 opacity-60' // Other dots
+                          }`}
+                        />
+                      );
+                    }
+                    return dots;
+                  })()}
+                </div>
             </>
           )}
         </div>
