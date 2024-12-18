@@ -1,11 +1,34 @@
-import React from 'react'
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const SearchBar = () => {
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const params = new URLSearchParams(window.location.search);
+    params.set("keyword", keyword);
+    router.push(`/listings/search?${params.toString()}`);
+  };
+
   return (
-    <div className="flex justify-center mt-8 mb-6">
-      <input type="text" placeholder="Search for a property..." className="max-w-4xl px-4 py-2 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-    </div>
-  )
-}
+    <form onSubmit={handleSearch} className="flex items-center w-full max-w-2xl p-2 rounded-lg shadow-lg">
+      <input
+        type="text"
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        placeholder="Search listings..."
+        className="flex-grow p-2 border-none focus:outline-none"
+      />
+      <button
+        type="submit"
+        className="px-4 py-2 font-semibold rounded-lg transition"
+      >
+        Search
+      </button>
+    </form>
+  );
+};
 
 export default SearchBar;

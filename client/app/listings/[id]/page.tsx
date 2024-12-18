@@ -1,5 +1,6 @@
 "use client"
-import Listingpage from '@/components/Listingpage';
+
+import ListingPage from '@/components/Listingpage';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -26,6 +27,7 @@ const ListingsPage = () => {
   
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
+  const [imageURLs, setImageURLs] = useState<string[]>([]);
 
   useEffect(() => {
     const checkUserAndFetchListing = async () => {
@@ -40,7 +42,7 @@ const ListingsPage = () => {
           .eq('listing_id', id)
           .single();
 
-          console.log(listingData)
+          // console.log(listingData)
         if (error) {
           console.error('Error fetching listing:', error);
           return;
@@ -59,7 +61,32 @@ const ListingsPage = () => {
       }
     };
 
+    const getImages = async() => {
+      const {data, error} = await supabase.storage.from('listing-photos').list(id + '/', {limit: 100});
+
+      if(error){
+        console.error(`Error listing files for ${id}: `, error.message);
+        return `/placeholder.jpg`;
+      }
+
+      if(data && data.length > 0){
+        supabase.storage.from('listing-photos').getPublicUrl(`${id}/${data[0].name}`);
+
+        const publicURLs = await Promise.all(
+          data.map(async (file) => {
+            const { data: publicURLData } = supabase.storage.from('listing-photos').getPublicUrl(`${id}/${file.name}`);
+            return publicURLData?.publicUrl || "/placeholder.jpg"; // Return the URL or a placeholder if not found
+          })
+        )
+
+        setImageURLs(publicURLs);
+      }
+
+      return "/placeholder.jpg";
+    }
+
     checkUserAndFetchListing();
+    getImages();
   }, [id, router, supabase]);
 
   if (loading) {
@@ -72,8 +99,8 @@ const ListingsPage = () => {
 
   return (
     <div className="flex min-h-screen">
-      <Listingpage 
-        imageUrl={listing.listing_photo_id ? [listing.listing_photo_id] : ["/placeholder.jpg"]}
+      <ListingPage 
+        imageUrl={imageURLs || "/placeholder.jpg"}
         status={listing.status}
         address={listing.address}
         rent={listing.rent}

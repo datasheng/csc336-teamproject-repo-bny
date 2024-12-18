@@ -1,7 +1,10 @@
 "use client"
 
+import { createClient } from "@/utils/supabase/client";
 import Image from "next/legacy/image";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 interface PropertyCardProps{
     imageUrl: string[];
@@ -13,17 +16,21 @@ interface PropertyCardProps{
     levels: number;
     sqft: number;
     author: string;
+    listingID: string;
 }
 
-const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, rent, beds, baths, levels, sqft}) => {
+const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, rent, beds, baths, levels, sqft, author, listingID}) => {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const supabase = createClient();
 
-  const handleNext = () => {
+  const handleNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setCurrentIdx((prevIdx) => (prevIdx + 1) % imageUrl.length);
     console.log(imageUrl);
   };
 
-  const handlePrev = () => {
+  const handlePrev = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setCurrentIdx((prevIdx) => prevIdx === 0 ? imageUrl.length - 1 : prevIdx - 1);
   }
 
@@ -53,7 +60,16 @@ const ListingCard: React.FC<PropertyCardProps> = ({imageUrl, status, address, re
       </div>
 
       <div className="p-4">
-        <h2 className='text-2xl font-semibold'>{address}</h2>
+        <div className="flex">
+          <h2 className='text-2xl font-semibold'>{address}</h2>
+
+          <Link href={`/listings/${listingID}`}>
+            <Button className="ml-5 dark:bg-black text-white dark:hover:bg-gray-500">
+              View
+            </Button>
+          </Link>
+        </div>
+
         <p className='text-lg font-bold mt-2 text-red-600'>${rent}</p>
       </div>
 

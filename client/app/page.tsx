@@ -1,6 +1,5 @@
 "use client"
 
-import ListingCard from "@/components/ListingCard";
 import SearchBar from "@/components/SearchBar";
 import lightBg from "@/public/images/homepageBackground.jpeg";
 import darkBg from "@/public/images/homePageBackgroundImageDark.jpg";
@@ -12,7 +11,6 @@ import { motion } from 'framer-motion';
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import Navbar from "@/components/Navbar";
 
 const cards = [
   { 
@@ -32,7 +30,7 @@ export default function Home() {
   const [listings, setListings] = useState<any[]>([]);
   const {theme} = useTheme();
   const supabase = createClient();
-
+  
   useEffect(() => {
     const fetchListings = async() => {
       const {data, error} = await supabase.from('listings').select('listing_id, title, description, address, status, rent, max_roommates, beds, baths, levels, sqft').order('created_at', {ascending: false})
@@ -82,22 +80,6 @@ export default function Home() {
               </Link>
             )
           })}
-        </div>
-      </div>
-
-      <div className="flex flex-col items-center mt-8">
-        <motion.h1 className="text-6xl font-bold"  initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }} viewport={{ once: true }}>
-          Listings
-        </motion.h1>
-
-        <div className="grid grid-cols-1 md:grids-cols-2 lg:grid-cols-3 gap-8 mt-12 mb-10">
-          {/* {listings.map((property, index) => {
-            return(
-              <motion.div key={index} initial={{ opacity: 0, y: -20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.1 }} viewport={{ once: true }}>
-                <ListingCard {...property} />
-              </motion.div>
-            )
-          })} */}
         </div>
       </div>
     </div>
