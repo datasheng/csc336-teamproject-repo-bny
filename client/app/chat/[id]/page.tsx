@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Send, UserPlus } from "lucide-react";
 import Image from "next/legacy/image";
 import { toast } from "sonner";
+import Header from '@/components/Header';
 
 interface Message {
   message_id: string;
@@ -79,12 +80,12 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
           setMessages(messagesData);
         }
 
+        console.log(recipientId);
+
         // Get recipient details
-        const { data: recipientData } = await supabase
-          .from('user')
-          .select('full_name, avatar_url')
-          .eq('user_id', recipientId)
-          .single();
+        const { data: recipientData } = await supabase.from("user").select("full_name, avatar_url").eq("user_id", recipientId).single()
+
+          console.log(recipientData);
 
         if (recipientData) {
           setRecipientName(recipientData.full_name);
@@ -186,6 +187,7 @@ const ChatInterface = ({ params: { id } }: ChatProps) => {
 
   return (
     <div className="min-h-screen bg-gray-900 p-4">
+      <Header/>
       <div className='max-w-3xl mx-auto rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow bg-gray-800 h-[calc(100vh-2rem)] border border-gray-700'>
         {/* Chat Header */}
         <div className="p-6 border-b border-gray-700 bg-gray-800">
