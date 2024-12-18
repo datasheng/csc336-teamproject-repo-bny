@@ -1,15 +1,32 @@
-import pickle
-import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+import pandas as pd
+import matplotlib.pyplot as plt
+import joblib
+import seaborn as sns
+import os
 
-# Load the model
-with open('rent-prediction.pkl', 'rb') as f:
-    loaded_model = pickle.load(f)
 
-# Create sample test data
-test_data = np.random.rand(5, 4)  # 5 samples with 4 features each
 
-# Make predictions
-predictions = loaded_model.predict(test_data)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(current_dir, '..', 'rent-prediction.pkl')
+model = joblib.load(model_path)
 
-print("Test data shape:", test_data.shape)
-print("Predictions:", predictions)
+new_data = {
+    'type_number': 1,
+    'sqfeet': 1200,
+    'lat': 37.7749,    
+    'long': -122.4194,
+    'beds': 2,
+    'baths': 2,
+    'state_number': 34,
+}
+
+df = pd.DataFrame([new_data])
+
+prediction = model.predict(df)
+
+print(f'Predicted rent: {prediction[0]}')
+
